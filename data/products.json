@@ -1,0 +1,372 @@
+{
+  "products": [
+    {
+      "id": "food-001",
+      "name": "Plant-Based Protein Cookies",
+      "description": "Delicious vegan cookies packed with 12g plant protein per serving. Made with almond flour and natural sweeteners.",
+      "category": "food",
+      "subcategory": "snacks",
+      "price": 299,
+      "imageUrl": "https://placehold.co/400x400/8B5CF6/FFFFFF?text=Protein+Cookies",
+      "brand": "NutriBite",
+      "dietary": {
+        "isVegan": true,
+        "isVegetarian": true,
+        "isGlutenFree": true,
+        "isProteinRich": true,
+        "isOrganic": false,
+        "isLowCalorie": false
+      },
+      "tags": ["vegan", "protein", "snacks", "cookies", "healthy", "gluten-free"],
+      "rating": 4.5,
+      "inStock": true
+    },
+    {
+      "id": "food-002",
+      "name": "Oats & Chia Seed Energy Bars",
+      "description": "Perfect breakfast on-the-go with 15g protein, made with rolled oats, chia seeds, and honey.",
+      "category": "food",
+      "subcategory": "breakfast",
+      "price": 349,
+      "imageUrl": "https://placehold.co/400x400/10B981/FFFFFF?text=Energy+Bars",
+      "brand": "MornFit",
+      "dietary": {
+        "isVegan": false,
+        "isVegetarian": true,
+        "isGlutenFree": false,
+        "isProteinRich": true,
+        "isOrganic": true,
+        "isLowCalorie": false
+      },
+      "tags": ["breakfast", "protein", "oats", "chia", "energy", "bars"],
+      "rating": 4.7,
+      "inStock": true
+    },
+    {
+      "id": "food-003",
+      "name": "Quinoa Energy Bites",
+      "description": "Gluten-free superfood snacks made with quinoa, dates, and dark chocolate. 100% natural ingredients.",
+      "category": "food",
+      "subcategory": "snacks",
+      "price": 279,
+      "imageUrl": "https://placehold.co/400x400/F59E0B/FFFFFF?text=Quinoa+Bites",
+      "brand": "SuperMunch",
+      "dietary": {
+        "isVegan": true,
+        "isVegetarian": true,
+        "isGlutenFree": true,
+        "isProteinRich": false,
+        "isOrganic": true,
+        "isLowCalorie": false
+      },
+      "tags": ["quinoa", "gluten-free", "vegan", "superfood", "healthy", "snacks"],
+      "rating": 4.3,
+      "inStock": true
+    },
+    {
+      "id": "food-004",
+      "name": "Masala Roasted Makhana",
+      "description": "Traditional fox nuts roasted with authentic Indian spices. Low calorie, high protein snack.",
+      "category": "food",
+      "subcategory": "snacks",
+      "price": 199,
+      "imageUrl": "https://placehold.co/400x400/EF4444/FFFFFF?text=Masala+Makhana",
+      "brand": "DesiMunch",
+      "dietary": {
+        "isVegan": true,
+        "isVegetarian": true,
+        "isGlutenFree": true,
+        "isProteinRich": true,
+        "isOrganic": false,
+        "isLowCalorie": true
+      },
+      "tags": ["makhana", "indian", "spicy", "low-calorie", "vegan", "traditional"],
+      "rating": 4.6,
+      "inStock": true
+    },
+    {
+      "id": "food-005",
+      "name": "Organic Granola Mix",
+      "description": "Crunchy breakfast granola with almonds, cranberries, and honey. Perfect with milk or yogurt.",
+      "category": "food",
+      "subcategory": "breakfast",
+      "price": 449,
+      "imageUrl": "https://placehold.co/400x400/6366F1/FFFFFF?text=Granola+Mix",
+      "brand": "MornFit",
+      "dietary": {
+        "isVegan": false,
+        "isVegetarian": true,
+        "isGlutenFree": false,
+        "isProteinRich": false,
+        "isOrganic": true,
+        "isLowCalorie": false
+      },
+      "tags": ["granola", "breakfast", "organic", "almonds", "cranberry"],
+      "rating": 4.4,
+      "inStock": true
+    },
+    {
+      "id": "food-006",
+      "name": "Peanut Butter Protein Spread",
+      "description": "All-natural peanut butter with added whey protein. 25g protein per 100g. No added sugar.",
+      "category": "food",
+      "subcategory": "spreads",
+      "price": 399,
+      "imageUrl": "https://placehold.co/400x400/D97706/FFFFFF?text=Peanut+Butter",
+      "brand": "NutriBite",
+      "dietary": {
+        "isVegan": false,
+        "isVegetarian": true,
+        "isGlutenFree": true,
+        "isProteinRich": true,
+        "isOrganic": false,
+        "isLowCalorie": false
+      },
+      "tags": ["peanut butter", "protein", "spread", "no-sugar", "fitness"],
+      "rating": 4.8,
+      "inStock": true
+    },
+    {
+      "id": "food-007",
+      "name": "Mixed Dry Fruits Trail Mix",
+      "description": "Premium blend of almonds, cashews, raisins, and dried apricots. Perfect healthy snacking.",
+      "category": "food",
+      "subcategory": "snacks",
+      "price": 549,
+      "imageUrl": "https://placehold.co/400x400/059669/FFFFFF?text=Trail+Mix",
+      "brand": "NutriBox",
+      "dietary": {
+        "isVegan": true,
+        "isVegetarian": true,
+        "isGlutenFree": true,
+        "isProteinRich": true,
+        "isOrganic": false,
+        "isLowCalorie": false
+      },
+      "tags": ["dry fruits", "trail mix", "almonds", "cashews", "healthy"],
+      "rating": 4.5,
+      "inStock": true
+    },
+    {
+      "id": "food-008",
+      "name": "Herbal Green Tea Collection",
+      "description": "Assorted pack of green tea with tulsi, jasmine, and mint variants. Rich in antioxidants.",
+      "category": "food",
+      "subcategory": "beverages",
+      "price": 299,
+      "imageUrl": "https://placehold.co/400x400/22C55E/FFFFFF?text=Green+Tea",
+      "brand": "TeaVeda",
+      "dietary": {
+        "isVegan": true,
+        "isVegetarian": true,
+        "isGlutenFree": true,
+        "isProteinRich": false,
+        "isOrganic": true,
+        "isLowCalorie": true
+      },
+      "tags": ["green tea", "herbal", "antioxidants", "organic", "wellness"],
+      "rating": 4.6,
+      "inStock": true
+    },
+    {
+      "id": "fashion-001",
+      "name": "Handblock Print Cotton Kurta",
+      "description": "Authentic Jaipur handblock printed kurta in breathable cotton. Perfect for summer occasions.",
+      "category": "fashion",
+      "subcategory": "ethnic",
+      "price": 1499,
+      "imageUrl": "https://placehold.co/400x400/8B5CF6/FFFFFF?text=Block+Print+Kurta",
+      "brand": "IndieThreads",
+      "style": {
+        "type": "ethnic",
+        "occasion": ["casual", "festive", "office"],
+        "fabric": "cotton",
+        "fit": "regular",
+        "season": "summer"
+      },
+      "tags": ["kurta", "ethnic", "cotton", "handblock", "summer", "jaipur"],
+      "rating": 4.7,
+      "inStock": true
+    },
+    {
+      "id": "fashion-002",
+      "name": "Oversized Cotton Tee",
+      "description": "Trendy oversized fit t-shirt in premium 180 GSM cotton. Streetwear inspired design.",
+      "category": "fashion",
+      "subcategory": "casual",
+      "price": 799,
+      "imageUrl": "https://placehold.co/400x400/3B82F6/FFFFFF?text=Oversized+Tee",
+      "brand": "UrbanDrift",
+      "style": {
+        "type": "streetwear",
+        "occasion": ["casual", "college"],
+        "fabric": "cotton",
+        "fit": "oversized",
+        "season": "all-season"
+      },
+      "tags": ["t-shirt", "oversized", "casual", "streetwear", "cotton", "trendy"],
+      "rating": 4.4,
+      "inStock": true
+    },
+    {
+      "id": "fashion-003",
+      "name": "Linen Blend Formal Shirt",
+      "description": "Sophisticated linen-cotton blend shirt perfect for office and formal occasions.",
+      "category": "fashion",
+      "subcategory": "formal",
+      "price": 1299,
+      "imageUrl": "https://placehold.co/400x400/1F2937/FFFFFF?text=Formal+Shirt",
+      "brand": "ClassicWeave",
+      "style": {
+        "type": "formal",
+        "occasion": ["office", "meeting", "formal"],
+        "fabric": "linen-cotton",
+        "fit": "slim",
+        "season": "summer"
+      },
+      "tags": ["shirt", "formal", "linen", "office", "professional", "slim-fit"],
+      "rating": 4.5,
+      "inStock": true
+    },
+    {
+      "id": "fashion-004",
+      "name": "Embroidered Chikankari Kurti",
+      "description": "Elegant Lucknowi chikankari embroidered kurti in soft georgette fabric.",
+      "category": "fashion",
+      "subcategory": "ethnic",
+      "price": 1899,
+      "imageUrl": "https://placehold.co/400x400/EC4899/FFFFFF?text=Chikankari+Kurti",
+      "brand": "IndieThreads",
+      "style": {
+        "type": "ethnic",
+        "occasion": ["festive", "wedding", "party"],
+        "fabric": "georgette",
+        "fit": "regular",
+        "season": "all-season"
+      },
+      "tags": ["kurti", "chikankari", "embroidered", "ethnic", "lucknow", "festive"],
+      "rating": 4.8,
+      "inStock": true
+    },
+    {
+      "id": "fashion-005",
+      "name": "Athletic Dry-Fit Track Pants",
+      "description": "Moisture-wicking track pants with zippered pockets. Ideal for workouts and jogging.",
+      "category": "fashion",
+      "subcategory": "sportswear",
+      "price": 899,
+      "imageUrl": "https://placehold.co/400x400/14B8A6/FFFFFF?text=Track+Pants",
+      "brand": "ActiveEdge",
+      "style": {
+        "type": "sportswear",
+        "occasion": ["gym", "sports", "casual"],
+        "fabric": "polyester",
+        "fit": "regular",
+        "season": "all-season"
+      },
+      "tags": ["track pants", "sports", "gym", "dry-fit", "athletic", "workout"],
+      "rating": 4.3,
+      "inStock": true
+    },
+    {
+      "id": "fashion-006",
+      "name": "Classic Denim Jacket",
+      "description": "Timeless indigo denim jacket with brass buttons. Perfect layering piece for all seasons.",
+      "category": "fashion",
+      "subcategory": "casual",
+      "price": 1799,
+      "imageUrl": "https://placehold.co/400x400/4338CA/FFFFFF?text=Denim+Jacket",
+      "brand": "UrbanDrift",
+      "style": {
+        "type": "casual",
+        "occasion": ["casual", "party", "date"],
+        "fabric": "denim",
+        "fit": "regular",
+        "season": "winter"
+      },
+      "tags": ["denim", "jacket", "casual", "winter", "classic", "layering"],
+      "rating": 4.6,
+      "inStock": true
+    },
+    {
+      "id": "fashion-007",
+      "name": "Printed Palazzo Pants",
+      "description": "Comfortable wide-leg palazzo pants with ethnic print. Pairs well with kurtis and tops.",
+      "category": "fashion",
+      "subcategory": "ethnic",
+      "price": 699,
+      "imageUrl": "https://placehold.co/400x400/F97316/FFFFFF?text=Palazzo+Pants",
+      "brand": "IndieThreads",
+      "style": {
+        "type": "ethnic",
+        "occasion": ["casual", "office", "festive"],
+        "fabric": "rayon",
+        "fit": "relaxed",
+        "season": "summer"
+      },
+      "tags": ["palazzo", "ethnic", "printed", "comfortable", "rayon", "summer"],
+      "rating": 4.4,
+      "inStock": true
+    },
+    {
+      "id": "fashion-008",
+      "name": "Slim Fit Chinos",
+      "description": "Versatile stretch chinos that transition from office to weekend. Available in multiple colors.",
+      "category": "fashion",
+      "subcategory": "casual",
+      "price": 1199,
+      "imageUrl": "https://placehold.co/400x400/78716C/FFFFFF?text=Slim+Chinos",
+      "brand": "ClassicWeave",
+      "style": {
+        "type": "casual",
+        "occasion": ["office", "casual", "date"],
+        "fabric": "cotton-stretch",
+        "fit": "slim",
+        "season": "all-season"
+      },
+      "tags": ["chinos", "slim-fit", "office", "casual", "stretch", "versatile"],
+      "rating": 4.5,
+      "inStock": true
+    },
+    {
+      "id": "fashion-009",
+      "name": "Woolen Ethnic Stole",
+      "description": "Handwoven woolen stole with traditional motifs. Perfect winter accessory for ethnic outfits.",
+      "category": "fashion",
+      "subcategory": "accessories",
+      "price": 599,
+      "imageUrl": "https://placehold.co/400x400/7C3AED/FFFFFF?text=Ethnic+Stole",
+      "brand": "IndieThreads",
+      "style": {
+        "type": "ethnic",
+        "occasion": ["festive", "winter", "wedding"],
+        "fabric": "wool",
+        "fit": "regular",
+        "season": "winter"
+      },
+      "tags": ["stole", "woolen", "ethnic", "winter", "handwoven", "accessory"],
+      "rating": 4.2,
+      "inStock": true
+    },
+    {
+      "id": "fashion-010",
+      "name": "Relaxed Fit Joggers",
+      "description": "Ultra-comfortable fleece joggers with elastic waistband. Perfect for lounging and casual outings.",
+      "category": "fashion",
+      "subcategory": "casual",
+      "price": 849,
+      "imageUrl": "https://placehold.co/400x400/6B7280/FFFFFF?text=Joggers",
+      "brand": "UrbanDrift",
+      "style": {
+        "type": "casual",
+        "occasion": ["casual", "lounge", "travel"],
+        "fabric": "fleece",
+        "fit": "relaxed",
+        "season": "winter"
+      },
+      "tags": ["joggers", "comfortable", "lounge", "casual", "fleece", "relaxed"],
+      "rating": 4.5,
+      "inStock": true
+    }
+  ]
+}
