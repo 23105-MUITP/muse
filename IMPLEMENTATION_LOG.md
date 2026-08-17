@@ -1,5 +1,14 @@
 # Implementation log
 
+## 2026-08-17 — Match catalog product types, not cousin items
+
+Shirt was only one example: any typed query (cookies, jacket, makhana, kurta, tee) could collapse onto a shared adjective like cotton. Matching now builds a type index from the live catalog and gates on the most specific product type in the query. Unit tests cover every SKU plus 18 typed phrases.
+
+**Tested**
+- `npx vitest run` — 78 passed
+- `npx tsc --noEmit` — pass
+- Production Playwright — pending deploy
+
 ## 2026-08-17 — Shirt queries must return shirts
 
 "White cotton shirt" was matching on cotton, so kurtas and tees came back instead of the formal shirt. Product type now wins over color and fabric; colors are optional because most SKUs have no color field. The linen formal shirt is tagged cotton/white so that query can score it.

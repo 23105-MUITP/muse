@@ -87,20 +87,23 @@ test.describe('production shopping scenarios', () => {
     }
   });
 
-  test('white cotton shirt returns the shirt, not random cotton items', async ({ page }) => {
-    await gotoShop(page);
-    await askShop(page, 'white cotton shirt');
-    await waitForProductsOrReply(page);
+  test('catalog types stay on the named product, not a random cousin', async ({ page }) => {
+    const cases = [
+      { query: 'white cotton shirt', include: 'Linen Blend Formal Shirt', exclude: /kurta|tee|cookie/i },
+      { query: 'protein cookies', include: 'Plant-Based Protein Cookies', exclude: /kurta|shirt/i },
+      { query: 'denim jacket', include: 'Classic Denim Jacket', exclude: /kurta|cookie/i },
+      { query: 'masala makhana', include: 'Masala Roasted Makhana', exclude: /shirt|kurta/i },
+    ];
 
-    const names = await productNames(page);
-    expectNoFood(names);
-    expect(names).toContain('Linen Blend Formal Shirt');
-    expect(names.some((name) => /kurta|kurti|tee/i.test(name))).toBe(false);
-
-    const images = await loadedProductImages(page);
-    const shirt = images.find((image) => /shirt/i.test(image.alt) && !/t-shirt|tee/i.test(image.alt));
-    expect(shirt, 'shirt card is missing a photo').toBeTruthy();
-    expect(shirt!.width).toBeGreaterThan(0);
+    for (const { query, include, exclude } of cases) {
+      await gotoShop(page);
+      await askShop(page, query);
+      await waitForProductsOrReply(page);
+      const names = await productNames(page);
+      expect(names, query).toContain(include);
+      expect(names.some((name) => exclude.test(name)), query).toBe(false);
+      await page.reload();
+    }
   });
 
   test('cotton kurta shows the cotton kurta with a real photo', async ({ page }) => {

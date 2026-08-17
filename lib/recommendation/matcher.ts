@@ -14,7 +14,7 @@ import {
   tokenize,
 } from './vocabulary';
 
-export { specificProductKeywords } from './vocabulary';
+import { catalogTypeGate } from './catalog-types';
 
 const SCORE_WEIGHTS = {
   category: 25,
@@ -297,6 +297,7 @@ export function matchProducts(
   context: ExtractedContext
 ): ScoredProduct[] {
   const searchKeywords = mergedSearchKeywords(context);
+  const typeGate = catalogTypeGate(searchKeywords, products);
   const requiredNoun = requiredProductNoun(searchKeywords);
   const specificKeywords = searchKeywords.filter(
     (keyword) => !BROWSE_WORDS.has(keyword) && !COLOR_WORDS.has(keyword)
@@ -323,6 +324,10 @@ export function matchProducts(
       return product.price <= context.budget.max;
     })
     .filter((product) => {
+      if (typeGate) {
+        return typeGate.has(product.id);
+      }
+
       if (requiredNoun) {
         return nounInCatalog && productMatchesNoun(product, requiredNoun);
       }
@@ -350,7 +355,7 @@ export function matchProducts(
       return true;
     });
 
-  if (requiredNoun && materials.length > 0) {
+  if ((typeGate || requiredNoun) && materials.length > 0) {
     const withMaterial = candidates.filter((product) =>
       materials.some((material) => productMatchesKeyword(product, material))
     );
