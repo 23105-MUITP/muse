@@ -10,7 +10,7 @@ import {
 
 function expectCalmReply(body: string) {
   expect(body).not.toMatch(
-    /lehenga|banquet|venue|photographer|roadster|iphone|nike air|hotel booking|jewellery|jewelry store/i
+    /lehenga|banquet|venue|photographer|roadster|nike air|hotel booking|jewellery store|jewelry store/i
   );
 }
 

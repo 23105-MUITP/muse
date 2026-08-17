@@ -226,7 +226,7 @@ test.describe('production shopping scenarios', () => {
 
   test('sample wardrobe prompt stays on ethnic fashion photos', async ({ page }) => {
     await gotoShop(page);
-    await page.getByRole('button', { name: /Light ethnic wear for summer/i }).click();
+    await page.getByRole('button', { name: /Light ethnic wear for summer|Build a summer look/i }).click();
     await page.waitForResponse(
       (response) =>
         response.url().includes('/api/chat') && response.request().method() === 'POST',

@@ -31,6 +31,17 @@ export const STOPWORDS = new Set([
   'ki',
   'mujhe',
   'chahiye',
+  'light',
+  'heavy',
+  'nice',
+  'good',
+  'cute',
+  'pretty',
+  'simple',
+  'best',
+  'new',
+  'perfect',
+  'daily',
 ]);
 
 export const CATEGORY_WORDS = new Set([

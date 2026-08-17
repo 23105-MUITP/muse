@@ -113,6 +113,20 @@ describe('matchProducts', () => {
     expect(results.every((product) => product.price <= 1000)).toBe(true);
   });
 
+  it('treats light ethnic wear for summer as a browse, not an unknown noun', () => {
+    const results = matchProducts(
+      products,
+      context({
+        category: 'fashion',
+        keywords: ['light', 'ethnic', 'wear', 'summer'],
+        originalQuery: 'Light ethnic wear for summer',
+      })
+    );
+
+    expect(results.length).toBeGreaterThan(0);
+    expect(results.every((product) => product.category === 'fashion')).toBe(true);
+  });
+
   it('treats wedding and shaadi as festive ethnic wear', () => {
     const wedding = matchProducts(
       products,
