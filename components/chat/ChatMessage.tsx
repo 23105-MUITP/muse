@@ -28,32 +28,35 @@ export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
       )}
     >
       {!isUser && (
-        <div className="flex-shrink-0 mt-0.5">
-          <BrandMark size={32} />
+        <div className="mt-0.5 flex-shrink-0">
+          <BrandMark size={28} />
         </div>
       )}
 
-      <div className={cn('flex-1', isUser ? 'text-right' : 'text-left')}>
-        <div
-          className={cn(
-            'inline-block px-4 py-3 max-w-[85%] text-left',
-            isUser
-              ? 'rounded-3xl rounded-tr-md bg-primary text-primary-foreground'
-              : 'rounded-3xl rounded-tl-md bg-card border border-border/70 paper-shadow'
-          )}
-        >
-          <div
-            className="text-sm leading-relaxed max-w-none [&_strong]:font-semibold"
-            dangerouslySetInnerHTML={{ __html: formattedContent }}
-          />
-          {isStreaming && (
-            <span className="inline-flex ml-1 align-middle">
-              <span className="w-1.5 h-1.5 bg-current rounded-full typing-dot" />
-              <span className="w-1.5 h-1.5 bg-current rounded-full typing-dot ml-1" />
-              <span className="w-1.5 h-1.5 bg-current rounded-full typing-dot ml-1" />
-            </span>
-          )}
-        </div>
+      <div className={cn('min-w-0 flex-1', isUser ? 'text-right' : 'text-left')}>
+        {isUser ? (
+          <div className="ml-auto inline-block max-w-[85%] rounded-[18px] rounded-tr-md bg-[#19171d] px-4 py-3 text-left text-white">
+            <div
+              className="text-sm leading-relaxed [&_strong]:font-semibold"
+              dangerouslySetInnerHTML={{ __html: formattedContent }}
+            />
+          </div>
+        ) : (
+          <div className="max-w-[min(100%,42rem)] pt-0.5 text-left">
+            <p className="mb-1.5 text-[11px] font-medium text-[#8b6de2]">Muse</p>
+            <div
+              className="text-sm leading-relaxed text-foreground [&_strong]:font-semibold"
+              dangerouslySetInnerHTML={{ __html: formattedContent }}
+            />
+            {isStreaming && (
+              <span className="ml-1 inline-flex align-middle">
+                <span className="typing-dot h-1.5 w-1.5 rounded-full bg-primary/70" />
+                <span className="typing-dot ml-1 h-1.5 w-1.5 rounded-full bg-primary/70" />
+                <span className="typing-dot ml-1 h-1.5 w-1.5 rounded-full bg-primary/70" />
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

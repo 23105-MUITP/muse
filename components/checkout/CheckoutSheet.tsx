@@ -165,7 +165,7 @@ export function CheckoutSheet() {
     <Sheet open={checkoutOpen} onOpenChange={handleOpenChange}>
       <SheetContent className="flex flex-col h-full sm:max-w-md w-full rounded-l-3xl border-l-border/70 bg-card">
         <SheetHeader>
-          <SheetTitle className="font-display text-2xl">
+          <SheetTitle className="text-2xl tracking-tight">
             {placedOrder ? 'Order confirmed' : 'Checkout'}
           </SheetTitle>
           <SheetDescription>

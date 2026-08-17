@@ -30,13 +30,13 @@ export function OrdersSheet() {
   return (
     <Sheet open={ordersOpen} onOpenChange={(open) => (open ? openOrders() : closeOrders())}>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="rounded-full h-11 w-11 border-border/80" data-testid="orders-trigger" aria-label="Orders">
+        <Button variant="outline" size="icon" className="h-10 w-10 rounded-xl border-[#e7e2eb] bg-white" data-testid="orders-trigger" aria-label="Orders">
           <Package className="h-5 w-5" />
         </Button>
       </SheetTrigger>
       <SheetContent className="flex flex-col h-full sm:max-w-md w-full rounded-l-3xl border-l-border/70 bg-card">
         <SheetHeader>
-          <SheetTitle className="font-display text-2xl">Orders ({orders.length})</SheetTitle>
+          <SheetTitle className="text-2xl tracking-tight">Orders ({orders.length})</SheetTitle>
           <SheetDescription>Mock checkout history stored on this device.</SheetDescription>
         </SheetHeader>
 

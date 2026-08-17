@@ -18,7 +18,7 @@ export function ChatInput({
   isLoading,
   voiceEnabled,
   onVoiceEnabledChange,
-  placeholder = 'Describe a craving, a look, or a budget…',
+  placeholder = 'Ask Muse anything about what you want to buy…',
 }: ChatInputProps) {
   const [input, setInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -73,31 +73,10 @@ export function ChatInput({
     <form onSubmit={handleSubmit} className="relative px-4 pb-5 pt-2">
       <div
         className={cn(
-          'flex items-end gap-2 rounded-full border bg-card p-1.5 pl-2 paper-shadow',
-          isRecording ? 'border-primary' : 'border-border'
+          'muse-composer rounded-[17px] border bg-white px-4 pb-3 pt-3.5 paper-shadow transition-shadow',
+          isRecording ? 'border-primary' : 'border-[#e7e2eb]'
         )}
       >
-        <button
-          type="button"
-          onClick={handleMicClick}
-          disabled={busy}
-          data-testid="voice-mic"
-          className={cn(
-            'h-11 w-11 rounded-full shrink-0 flex items-center justify-center transition-colors',
-            isRecording
-              ? 'bg-primary text-primary-foreground'
-              : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
-          )}
-          aria-label={isRecording ? 'Stop listening' : 'Start voice mode'}
-        >
-          {isTranscribing ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : isRecording ? (
-            <Square className="h-4 w-4 fill-current" />
-          ) : (
-            <Mic className="h-5 w-5" />
-          )}
-        </button>
         <textarea
           ref={textareaRef}
           value={input}
@@ -114,45 +93,72 @@ export function ChatInput({
           disabled={busy || isRecording}
           rows={1}
           className={cn(
-            'w-full resize-none bg-transparent py-3 pr-2 text-sm leading-relaxed',
-            'focus-visible:outline-none placeholder:text-muted-foreground',
+            'w-full resize-none bg-transparent text-sm leading-relaxed',
+            'focus-visible:outline-none placeholder:text-[#aaa6ad]',
             'disabled:cursor-not-allowed disabled:opacity-50',
-            'min-h-[44px] max-h-[120px]'
+            'min-h-[42px] max-h-[120px]'
           )}
         />
-        <button
-          type="button"
-          onClick={() => onVoiceEnabledChange(!voiceEnabled)}
-          data-testid="voice-speaker"
-          className={cn(
-            'h-11 w-11 rounded-full shrink-0 flex items-center justify-center',
-            voiceEnabled
-              ? 'text-primary'
-              : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
-          )}
-          aria-label={voiceEnabled ? 'Mute spoken replies' : 'Speak replies'}
-        >
-          {voiceEnabled ? (
-            <Volume2 className="h-5 w-5" />
-          ) : (
-            <VolumeX className="h-5 w-5" />
-          )}
-        </button>
-        <button
-          type="submit"
-          disabled={!input.trim() || busy || isRecording}
-          className="h-11 w-11 rounded-full shrink-0 bg-primary text-primary-foreground flex items-center justify-center transition-opacity disabled:opacity-40 hover:opacity-90"
-          aria-label="Send message"
-        >
-          {isLoading ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <ArrowUp className="h-5 w-5" />
-          )}
-        </button>
+        <div className="mt-2 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={handleMicClick}
+              disabled={busy}
+              data-testid="voice-mic"
+              className={cn(
+                'flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-[11px] transition-colors',
+                isRecording
+                  ? 'border-primary bg-accent text-primary'
+                  : 'border-[#e8e3ec] text-[#817a8a] hover:bg-secondary'
+              )}
+              aria-label={isRecording ? 'Stop listening' : 'Start voice mode'}
+            >
+              {isTranscribing ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : isRecording ? (
+                <Square className="h-3 w-3 fill-current" />
+              ) : (
+                <Mic className="h-3.5 w-3.5" />
+              )}
+              Voice
+            </button>
+            <button
+              type="button"
+              onClick={() => onVoiceEnabledChange(!voiceEnabled)}
+              data-testid="voice-speaker"
+              className={cn(
+                'flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-[11px] transition-colors',
+                voiceEnabled
+                  ? 'border-[#cfc1fa] bg-[#f7f3ff] text-[#7859d3]'
+                  : 'border-[#e8e3ec] text-[#817a8a] hover:bg-secondary'
+              )}
+              aria-label={voiceEnabled ? 'Mute spoken replies' : 'Speak replies'}
+            >
+              {voiceEnabled ? (
+                <Volume2 className="h-3.5 w-3.5" />
+              ) : (
+                <VolumeX className="h-3.5 w-3.5" />
+              )}
+              Speak
+            </button>
+          </div>
+          <button
+            type="submit"
+            disabled={!input.trim() || busy || isRecording}
+            className="grid h-[31px] w-[31px] shrink-0 place-items-center rounded-full bg-[#a184ed] text-white transition-opacity disabled:opacity-40 hover:opacity-90"
+            aria-label="Send message"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <ArrowUp className="h-4 w-4" />
+            )}
+          </button>
+        </div>
       </div>
       {error && (
-        <p className="text-xs text-destructive text-center mt-2">{error}</p>
+        <p className="mt-2 text-center text-xs text-destructive">{error}</p>
       )}
     </form>
   );

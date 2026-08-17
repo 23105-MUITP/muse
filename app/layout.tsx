@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Fraunces, Outfit } from 'next/font/google';
+import { Outfit } from 'next/font/google';
 import './globals.css';
 import { CartProvider } from '@/lib/context/CartContext';
 import { ComparisonProvider } from '@/lib/context/ComparisonContext';
@@ -11,16 +11,10 @@ const outfit = Outfit({
   variable: '--font-outfit',
 });
 
-const fraunces = Fraunces({
-  subsets: ['latin'],
-  variable: '--font-fraunces',
-  axes: ['SOFT', 'WONK'],
-});
-
 export const metadata: Metadata = {
-  title: 'Lumin — shopping, in conversation',
+  title: 'Muse — personal commerce AI',
   description:
-    'A warm shopping atelier for Indian D2C food and fashion. Describe what you want; Lumin finds it.',
+    'A conversational shopping assistant for Indian D2C food and fashion. Tell Muse what you want.',
 };
 
 export default function RootLayout({
@@ -30,7 +24,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${outfit.variable} ${fraunces.variable} font-sans`}>
+      <body className={`${outfit.variable} font-sans`}>
         <ShopUiProvider>
           <CartProvider>
             <OrderProvider>

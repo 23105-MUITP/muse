@@ -8,12 +8,16 @@ import { WelcomeMessage } from './WelcomeMessage';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ProductGrid } from '@/components/product/ProductGrid';
 import { ComparisonTable } from '@/components/product/ComparisonTable';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Menu } from 'lucide-react';
 import { useCart } from '@/lib/context/CartContext';
 import { useComparison } from '@/lib/context/ComparisonContext';
 import { useShopUi } from '@/lib/context/ShopUiContext';
 import { BrandMark } from '@/components/brand/BrandMark';
 import { useVoicePlayback } from '@/hooks/useVoicePlayback';
+import { AppSidebar } from '@/components/layout/AppSidebar';
+import { CartSheet } from '@/components/cart/CartSheet';
+import { OrdersSheet } from '@/components/orders/OrdersSheet';
+import { TasteSheet } from '@/components/taste/TasteSheet';
 import type { ScoredProduct, Product } from '@/lib/types';
 
 interface StreamDataItem {
@@ -23,6 +27,17 @@ interface StreamDataItem {
 }
 
 export function ChatContainer() {
+  const [sessionId, setSessionId] = useState(0);
+
+  return (
+    <ChatWorkspace
+      key={sessionId}
+      onNewConversation={() => setSessionId((id) => id + 1)}
+    />
+  );
+}
+
+function ChatWorkspace({ onNewConversation }: { onNewConversation: () => void }) {
   const { messages, isLoading, error, append, data } = useChat({
     api: '/api/chat',
   });
@@ -35,6 +50,9 @@ export function ChatContainer() {
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const spokenMessageIdRef = useRef<string | null>(null);
   const { speak, stop: stopSpeaking } = useVoicePlayback();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [tasteOpen, setTasteOpen] = useState(false);
+  const [historySearch, setHistorySearch] = useState('');
 
   const { products, lastAction } = useMemo(() => {
     if (!data || data.length === 0) return { products: [], lastAction: null };
@@ -119,75 +137,136 @@ export function ChatContainer() {
 
   const lastAssistantIndex = messages.findLastIndex((m) => m.role === 'assistant');
   const showProducts = products.length > 0 && lastAssistantIndex === messages.length - 1;
+  const isHome = messages.length === 0;
+  const recentTitles = messages
+    .filter((message) => message.role === 'user' && message.content.trim())
+    .map((message) => message.content.trim());
+
+  const composer = (
+    <ChatInput
+      onSubmit={handleFormSubmit}
+      isLoading={isLoading}
+      voiceEnabled={voiceEnabled}
+      onVoiceEnabledChange={setVoiceEnabled}
+    />
+  );
 
   return (
-    <div className="flex flex-col h-full">
-      <ScrollArea ref={scrollRef} className="flex-1 overflow-y-auto">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          {messages.length === 0 ? (
-            <WelcomeMessage onSampleQuery={handleSampleQuery} />
-          ) : (
-            <div className="space-y-6">
-              {messages.map((message, index) => (
-                <div key={message.id}>
-                  <ChatMessage
-                    role={message.role as 'user' | 'assistant'}
-                    content={message.content}
-                    isStreaming={
-                      isLoading &&
-                      index === messages.length - 1 &&
-                      message.role === 'assistant'
-                    }
-                  />
-                  {message.role === 'assistant' &&
-                    index === lastAssistantIndex &&
-                    showProducts &&
-                    !isLoading && (
-                      <div className="ml-11 mt-4">
-                        <ProductGrid products={products} />
-                      </div>
-                    )}
-                </div>
-              ))}
+    <div className="flex h-full w-full min-w-0 overflow-hidden">
+      <AppSidebar
+        recentTitles={recentTitles}
+        hasRecommendations={showProducts}
+        isHome={isHome}
+        search={historySearch}
+        onSearchChange={setHistorySearch}
+        onNewConversation={onNewConversation}
+        onDiscover={onNewConversation}
+        onRecommendations={() => {
+          document.getElementById('muse-recommendations')?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
+        }}
+        onSaved={() => setCartOpen(true)}
+        onTaste={() => setTasteOpen(true)}
+        mobileOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-              {isLoading && messages[messages.length - 1]?.role === 'user' && (
-                <div className="flex gap-3 items-center">
-                  <BrandMark size={32} />
-                  <div className="rounded-full bg-card border border-border/70 px-4 py-2.5 paper-shadow">
-                    <div className="flex gap-1">
-                      <span className="w-1.5 h-1.5 bg-primary/70 rounded-full typing-dot" />
-                      <span className="w-1.5 h-1.5 bg-primary/70 rounded-full typing-dot" />
-                      <span className="w-1.5 h-1.5 bg-primary/70 rounded-full typing-dot" />
-                    </div>
-                  </div>
-                </div>
-              )}
+      <div className="flex min-w-0 flex-1 flex-col bg-white/55">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-[#eeeaf0] px-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3">
+            <button
+              type="button"
+              className="grid h-9 w-9 place-items-center rounded-lg border border-[#e7e2eb] text-[#777] md:hidden"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open sidebar"
+            >
+              <Menu className="h-4 w-4" />
+            </button>
+            <p className="truncate text-[13px] font-semibold">
+              muse <span className="font-medium text-[#8e70df]">personal commerce AI</span>
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <OrdersSheet />
+            <CartSheet />
+          </div>
+        </header>
 
-              {error && (
-                <div className="flex items-center gap-2 text-destructive bg-destructive/10 p-4 rounded-2xl">
-                  <AlertCircle className="w-5 h-5 shrink-0" />
-                  <p className="text-sm">
-                    Sorry, something went wrong. Please try again.
-                  </p>
-                </div>
-              )}
+        {isHome ? (
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+            <div className="mx-auto flex w-full max-w-[800px] flex-1 flex-col justify-center px-4 py-8">
+              <WelcomeMessage onSampleQuery={handleSampleQuery} />
+              <div className="mx-auto mt-2 w-full max-w-[800px]">{composer}</div>
+              <p className="mt-2 pb-4 text-center text-[11px] text-[#aaa]">
+                Muse learns from your conversations — not from endless scrolling.
+              </p>
             </div>
-          )}
+          </div>
+        ) : (
+          <>
+            <ScrollArea ref={scrollRef} className="flex-1 overflow-y-auto">
+              <div className="mx-auto max-w-3xl px-4 py-6">
+                <div className="space-y-8">
+                  {messages.map((message, index) => (
+                    <div key={message.id}>
+                      <ChatMessage
+                        role={message.role as 'user' | 'assistant'}
+                        content={message.content}
+                        isStreaming={
+                          isLoading &&
+                          index === messages.length - 1 &&
+                          message.role === 'assistant'
+                        }
+                      />
+                      {message.role === 'assistant' &&
+                        index === lastAssistantIndex &&
+                        showProducts &&
+                        !isLoading && (
+                          <div id="muse-recommendations" className="mt-5">
+                            <ProductGrid products={products} />
+                          </div>
+                        )}
+                    </div>
+                  ))}
 
-          {comparisonProducts.length > 0 && <ComparisonTable />}
-        </div>
-      </ScrollArea>
+                  {isLoading && messages[messages.length - 1]?.role === 'user' && (
+                    <div className="flex items-center gap-3">
+                      <BrandMark size={36} pulse />
+                      <div>
+                        <p className="text-sm text-[#7355ca]">Finding your best matches…</p>
+                        <div className="mt-1.5 flex gap-1">
+                          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-primary/70" />
+                          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-primary/70" />
+                          <span className="typing-dot h-1.5 w-1.5 rounded-full bg-primary/70" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
-      <div className="bg-gradient-to-t from-background via-background/95 to-transparent">
-        <div className="max-w-4xl mx-auto">
-          <ChatInput
-            onSubmit={handleFormSubmit}
-            isLoading={isLoading}
-            voiceEnabled={voiceEnabled}
-            onVoiceEnabledChange={setVoiceEnabled}
-          />
-        </div>
+                  {error && (
+                    <div className="flex items-center gap-2 rounded-2xl bg-destructive/10 p-4 text-destructive">
+                      <AlertCircle className="h-5 w-5 shrink-0" />
+                      <p className="text-sm">
+                        Sorry, something went wrong. Please try again.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {comparisonProducts.length > 0 && <ComparisonTable />}
+              </div>
+            </ScrollArea>
+
+            <div className="bg-gradient-to-t from-white via-white/90 to-transparent">
+              <div className="mx-auto max-w-3xl">{composer}</div>
+            </div>
+          </>
+        )}
       </div>
+
+      <TasteSheet open={tasteOpen} onOpenChange={setTasteOpen} />
     </div>
   );
 }

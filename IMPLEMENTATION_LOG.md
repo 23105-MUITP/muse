@@ -1,5 +1,16 @@
 # Implementation log
 
+## 2026-08-17 — Muse AI workspace UI redesign
+
+Restyled the existing Next.js shopping assistant as a lavender AI workspace (sidebar, glowing Muse orb, conversational chat, magazine-style recommendation cards) without changing APIs, matching, checkout, voice, or catalog data. Conversation history in the sidebar is the current session's real user messages; taste profile only shows bag, orders, and saved delivery details already on device.
+
+**Tested**
+- `npx vitest run` — 31 passed
+- `npm run lint` — pass
+- `npx tsc --noEmit` — pass
+- `npx playwright test` — 26 passed (voice controls, checkout UPI + declined card, 17 shopping journeys, 6 STT round-trips)
+
+
 ## 2026-08-17 — Production e2e for kurta/kirtan voice misses
 
 Voice mode heard "kirtan" for "kurta under 500" and showed unrelated catalog photos. Added a production Playwright suite covering that miss plus homophones, budget, food vs fashion, and image loading. Whisper now gets a shopping prompt and kirtan→kurta correction; matching maps kirtan to kurtas, drops unknown terms, and hard-filters over-budget items. Catalog gained an Everyday Cotton Kurta at ₹449 so under-₹500 kurtas exist.

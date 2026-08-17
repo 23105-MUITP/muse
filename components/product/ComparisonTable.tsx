@@ -100,10 +100,10 @@ export function ComparisonTable() {
   ];
 
   return (
-    <Card className="mt-6 animate-fade-in rounded-3xl border-border/70 paper-shadow">
+    <Card className="mt-6 animate-fade-in rounded-[20px] border-[#ebe7ef] paper-shadow">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="font-display text-xl flex items-center gap-2">
+          <CardTitle className="text-xl tracking-tight flex items-center gap-2">
             <GitCompare className="h-5 w-5 text-primary" />
             Side by side
           </CardTitle>

@@ -26,7 +26,7 @@ export function CartSheet() {
         <Button
           variant="outline"
           size="icon"
-          className="relative rounded-full h-11 w-11 border-border/80"
+          className="relative h-10 w-10 rounded-xl border-[#e7e2eb] bg-white"
           data-testid="cart-trigger"
         >
           <ShoppingBag className="h-5 w-5" />
@@ -39,7 +39,7 @@ export function CartSheet() {
       </SheetTrigger>
       <SheetContent className="flex flex-col h-full rounded-l-3xl border-l-border/70 bg-card">
         <SheetHeader>
-          <SheetTitle className="font-display text-2xl">
+        <SheetTitle className="text-2xl tracking-tight">
             Your bag ({state.totalItems})
           </SheetTitle>
         </SheetHeader>
@@ -48,9 +48,9 @@ export function CartSheet() {
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <ShoppingBag className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="font-display text-xl">Nothing here yet</p>
+              <p className="text-xl tracking-tight">Nothing here yet</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Ask Lumin for something you actually want.
+                Ask Muse for something you actually want.
               </p>
             </div>
           </div>
