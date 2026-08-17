@@ -102,6 +102,8 @@ test.describe('production shopping scenarios', () => {
     expect(shirt, 'shirt card is missing a photo').toBeTruthy();
     expect(shirt!.width).toBeGreaterThan(0);
   });
+
+  test('cotton kurta shows the cotton kurta with a real photo', async ({ page }) => {
     await gotoShop(page);
     await askShop(page, 'cotton kurta');
     await waitForProductsOrReply(page);
