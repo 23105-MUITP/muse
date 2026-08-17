@@ -5,9 +5,9 @@
 Wedding/shaadi, office, gym, and other vague looks made the model invent inventory because occasion was not searchable and empty results were ungrounded. Matching now uses occasion, season, and dietary fields; spoken budgets normalize (`five hundred` → `500`); off-catalog nouns like shoes stay empty. Replies are forbidden from inventing products, venues, or tables.
 
 **Tested**
-- `npx vitest run` — 37 passed
+- `npx vitest run` — 37 passed (matcher 11 after adjective fix)
 - `npx tsc --noEmit` — pass
-- Production Playwright — pending deploy
+- Production Playwright on https://new-age-technologies-chi.vercel.app — occasion suite **9 passed** (wedding, shaadi, office, gym, festive, shoes, iPhone, spoken budget, summer ethnic prompt). Earlier full run **32/34**; the two failures were fixed and re-run green.
 
 ## 2026-08-17 — Muse AI workspace UI redesign
 
