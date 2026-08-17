@@ -1,0 +1,6 @@
+Local catalog photos (Wikimedia Commons). Unsplash items stay hotlinked from products.json.
+
+food-003.jpg  Date balls — Wikimedia Commons File:Date_balls.jpg
+food-004.jpg  Roasted Makhana (Foxnut) — Salil Kumar Mukherjee, Wikimedia Commons
+food-006.jpg  Peanut Butter Texture — freestock.ca, Wikimedia Commons
+food-007.jpg  Planters trail mix — Evan-Amos, Wikimedia Commons

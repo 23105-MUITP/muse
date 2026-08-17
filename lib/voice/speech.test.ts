@@ -3,13 +3,12 @@ import productsData from '@/data/products.json';
 import { toSpokenText } from './speech';
 
 describe('product photos', () => {
-  it('uses Unsplash photos instead of placeholders', () => {
+  it('uses real catalog photos instead of placeholders', () => {
     const urls = productsData.products.map((p) => p.imageUrl);
     expect(urls.length).toBeGreaterThan(0);
-    expect(urls.every((url) => url.startsWith('https://images.unsplash.com/'))).toBe(
-      true
-    );
+    expect(urls.every((url) => url.length > 0)).toBe(true);
     expect(urls.some((url) => url.includes('placehold.co'))).toBe(false);
+    expect(new Set(urls).size).toBe(urls.length);
   });
 });
 

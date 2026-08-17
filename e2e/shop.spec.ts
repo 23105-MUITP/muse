@@ -6,6 +6,7 @@ import {
   expectNoFashion,
   expectNoFood,
   expectNoKirtan,
+  expectPhotosMatchCards,
   gotoShop,
   loadedProductImages,
   productNames,
@@ -120,6 +121,7 @@ test.describe('production shopping scenarios', () => {
     const kurtaImage = images.find((image) => /kurta/i.test(image.alt));
     expect(kurtaImage, 'kurta card is missing an image').toBeTruthy();
     expect(kurtaImage!.width).toBeGreaterThan(0);
+    expectPhotosMatchCards(images.filter((image) => /kurta|kurti/i.test(image.alt)));
   });
 
   test('chikankari kurti stays on the embroidered kurti', async ({ page }) => {
@@ -224,6 +226,29 @@ test.describe('production shopping scenarios', () => {
     const images = await loadedProductImages(page);
     const makhana = images.find((image) => /makhana/i.test(image.alt));
     expect(makhana?.width).toBeGreaterThan(0);
+    expect(makhana?.src).toMatch(/food-004/);
+    expectPhotosMatchCards(images.filter((image) => /makhana/i.test(image.alt)));
+  });
+
+  test('catalog photos stay on the named product, not a cousin item', async ({ page }) => {
+    test.setTimeout(240_000);
+    const cases = [
+      { query: 'cotton kurta', include: /kurta/i },
+      { query: 'masala makhana', include: /makhana/i },
+      { query: 'denim jacket', include: /jacket/i },
+      { query: 'protein cookies', include: /cookie/i },
+    ];
+
+    for (const { query, include } of cases) {
+      await gotoShop(page);
+      await askShop(page, query);
+      await waitForProductsOrReply(page);
+      const images = await loadedProductImages(page);
+      const matched = images.filter((image) => include.test(image.alt));
+      expect(matched.length, query).toBeGreaterThan(0);
+      expectPhotosMatchCards(matched);
+      await page.reload();
+    }
   });
 
   test('greeting does not invent product photos', async ({ page }) => {

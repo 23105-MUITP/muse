@@ -35,7 +35,7 @@
       "category": "food",
       "subcategory": "breakfast",
       "price": 349,
-      "imageUrl": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=900&q=80",
+      "imageUrl": "https://images.unsplash.com/photo-1633360821154-1935fb5671e6?auto=format&fit=crop&w=900&q=80",
       "brand": "MornFit",
       "dietary": {
         "isVegan": false,
@@ -63,7 +63,7 @@
       "category": "food",
       "subcategory": "snacks",
       "price": 279,
-      "imageUrl": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=80",
+      "imageUrl": "/images/products/food-003.jpg",
       "brand": "SuperMunch",
       "dietary": {
         "isVegan": true,
@@ -91,7 +91,7 @@
       "category": "food",
       "subcategory": "snacks",
       "price": 199,
-      "imageUrl": "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?auto=format&fit=crop&w=900&q=80",
+      "imageUrl": "/images/products/food-004.jpg",
       "brand": "DesiMunch",
       "dietary": {
         "isVegan": true,
@@ -119,7 +119,7 @@
       "category": "food",
       "subcategory": "breakfast",
       "price": 449,
-      "imageUrl": "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=900&q=80",
+      "imageUrl": "https://images.unsplash.com/photo-1724441980123-aca7911329d0?auto=format&fit=crop&w=900&q=80",
       "brand": "MornFit",
       "dietary": {
         "isVegan": false,
@@ -146,7 +146,7 @@
       "category": "food",
       "subcategory": "spreads",
       "price": 399,
-      "imageUrl": "https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=900&q=80",
+      "imageUrl": "/images/products/food-006.jpg",
       "brand": "NutriBite",
       "dietary": {
         "isVegan": false,
@@ -173,7 +173,7 @@
       "category": "food",
       "subcategory": "snacks",
       "price": 549,
-      "imageUrl": "https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=900&q=80",
+      "imageUrl": "/images/products/food-007.jpg",
       "brand": "NutriBox",
       "dietary": {
         "isVegan": true,
@@ -200,7 +200,7 @@
       "category": "food",
       "subcategory": "beverages",
       "price": 299,
-      "imageUrl": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=900&q=80",
+      "imageUrl": "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?auto=format&fit=crop&w=900&q=80",
       "brand": "TeaVeda",
       "dietary": {
         "isVegan": true,
@@ -227,7 +227,7 @@
       "category": "fashion",
       "subcategory": "ethnic",
       "price": 1499,
-      "imageUrl": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=80",
+      "imageUrl": "https://images.unsplash.com/photo-1742800764280-d51117b7eb0a?auto=format&fit=crop&w=900&q=80",
       "brand": "IndieThreads",
       "style": {
         "type": "ethnic",
@@ -258,7 +258,7 @@
       "category": "fashion",
       "subcategory": "ethnic",
       "price": 449,
-      "imageUrl": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=80",
+      "imageUrl": "https://images.unsplash.com/photo-1759567066672-4b9f48000096?auto=format&fit=crop&w=900&q=80",
       "brand": "IndieThreads",
       "style": {
         "type": "ethnic",
@@ -351,7 +351,7 @@
       "category": "fashion",
       "subcategory": "ethnic",
       "price": 1899,
-      "imageUrl": "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=900&q=80",
+      "imageUrl": "https://images.unsplash.com/photo-1745313452052-0e4e341f326c?auto=format&fit=crop&w=900&q=80",
       "brand": "IndieThreads",
       "style": {
         "type": "ethnic",
@@ -382,7 +382,7 @@
       "category": "fashion",
       "subcategory": "sportswear",
       "price": 899,
-      "imageUrl": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80",
+      "imageUrl": "https://images.unsplash.com/photo-1715532098035-a343b26eaeaa?auto=format&fit=crop&w=900&q=80",
       "brand": "ActiveEdge",
       "style": {
         "type": "sportswear",
@@ -413,7 +413,7 @@
       "category": "fashion",
       "subcategory": "casual",
       "price": 1799,
-      "imageUrl": "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=900&q=80",
+      "imageUrl": "https://images.unsplash.com/photo-1527016021513-b09758b777bd?auto=format&fit=crop&w=900&q=80",
       "brand": "UrbanDrift",
       "style": {
         "type": "casual",
@@ -444,7 +444,7 @@
       "category": "fashion",
       "subcategory": "ethnic",
       "price": 699,
-      "imageUrl": "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=900&q=80",
+      "imageUrl": "https://images.unsplash.com/photo-1765529375039-13dabeab0684?auto=format&fit=crop&w=900&q=80",
       "brand": "IndieThreads",
       "style": {
         "type": "ethnic",
@@ -506,7 +506,7 @@
       "category": "fashion",
       "subcategory": "accessories",
       "price": 599,
-      "imageUrl": "https://images.unsplash.com/photo-1601924994987-69e26d50dc26?auto=format&fit=crop&w=900&q=80",
+      "imageUrl": "https://images.unsplash.com/photo-1667498235479-5ed70fb3eda4?auto=format&fit=crop&w=900&q=80",
       "brand": "IndieThreads",
       "style": {
         "type": "ethnic",

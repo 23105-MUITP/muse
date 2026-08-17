@@ -101,6 +101,39 @@ export function expectNoKirtan(text: string, names: string[]) {
   expect(names.join(' '), 'product names mentioned kirtan').not.toMatch(/\bkirtan\b/i);
 }
 
+/** Photos that used to appear on the wrong product card. */
+export const MISMATCHED_PHOTO_IDS = [
+  '1610030469983',
+  '1617627143750',
+  '1622483767028',
+  '1512621776951',
+  '1599599810769',
+  '1490474418585',
+  '1505253758473',
+  '1508747703725',
+  '1556679343',
+  '1576995853123',
+  '1594633312681',
+  '1601924994987',
+  '1515886657613',
+];
+
+export function expectPhotosMatchCards(
+  images: Array<{ alt: string; src: string; width: number }>
+) {
+  expect(images.length, 'expected loaded product photos').toBeGreaterThan(0);
+  const srcs = images.map((image) => image.src);
+  expect(new Set(srcs).size, 'two cards are sharing one photo').toBe(srcs.length);
+  for (const image of images) {
+    expect(image.width, `broken image for ${image.alt}`).toBeGreaterThan(0);
+    for (const photoId of MISMATCHED_PHOTO_IDS) {
+      expect(image.src, `${image.alt} still uses stale photo ${photoId}`).not.toContain(
+        photoId
+      );
+    }
+  }
+}
+
 export async function loadedProductImages(page: Page) {
   const images = page.getByTestId('product-image').or(page.locator('article img, [data-testid="product-card"] img, img[alt]'));
   const count = await images.count();

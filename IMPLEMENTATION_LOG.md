@@ -1,5 +1,15 @@
 # Implementation log
 
+## 2026-08-17 — Product photos match the named SKU
+
+Saree-on-kurta was one case of a catalog-wide mismatch: kurtas and kurtis used saree photos, bars used Coca-Cola, makhana used chocolates, trail mix used onions, jackets used a jeans rack, and so on. Every SKU now has its own verified photo; Indian snacks that Unsplash does not have are stored locally.
+
+**Tested**
+- `npx vitest run` — pending
+- `npx tsc --noEmit` — pending
+- Production Playwright — pending
+
+
 ## 2026-08-17 — Match catalog product types, not cousin items
 
 Shirt was only one example: any typed query (cookies, jacket, makhana, kurta, tee) could collapse onto a shared adjective like cotton. Matching now builds a type index from the live catalog and gates on the most specific product type in the query. Unit tests cover every SKU plus 18 typed phrases.
