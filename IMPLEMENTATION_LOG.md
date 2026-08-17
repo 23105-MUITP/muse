@@ -7,7 +7,7 @@ Shirt was only one example: any typed query (cookies, jacket, makhana, kurta, te
 **Tested**
 - `npx vitest run` — 78 passed
 - `npx tsc --noEmit` — pass
-- Production Playwright — pending deploy
+- Production Playwright on https://new-age-technologies-chi.vercel.app — **6 passed**: catalog types (white cotton shirt, protein cookies, denim jacket, masala makhana), cotton kurta, chikankari kurti, palazzo pants, oversized tee, green tea
 
 ## 2026-08-17 — Shirt queries must return shirts
 
