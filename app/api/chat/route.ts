@@ -11,6 +11,7 @@ import {
   generateOrdersResponse,
 } from '@/lib/ai/generate-response';
 import { matchProducts } from '@/lib/recommendation/matcher';
+import { normalizeShoppingQuery } from '@/lib/voice/normalize-query';
 import productsData from '@/data/products.json';
 import type { Product, ScoredProduct } from '@/lib/types';
 
@@ -39,7 +40,18 @@ export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
     const lastMessage = messages[messages.length - 1];
-    const userQuery = lastMessage.content;
+    const userQuery = normalizeShoppingQuery(
+      typeof lastMessage?.content === 'string' ? lastMessage.content : ''
+    );
+
+    if (!userQuery) {
+      const data = new StreamData();
+      const result = await generateOtherResponse(
+        'The user sent an empty message. Ask what they want to shop for.'
+      );
+      data.close();
+      return result.toDataStreamResponse({ data });
+    }
 
     // Extract conversation history for context
     const conversationHistory = messages.slice(0, -1).map((m: { role: string; content: string }) => ({
@@ -157,10 +169,28 @@ export async function POST(req: Request) {
       }
     }
 
-    // Handle other/unknown intent
+    // Occasion and shopping queries must still match even if the model said "other".
     if (context.intent === 'other' && context.category === 'unknown') {
-      const result = await generateOtherResponse(userQuery);
-      data.close();
+      const maybeProducts = matchProducts(products, {
+        ...context,
+        intent: 'search',
+      });
+      if (maybeProducts.length === 0) {
+        const result = await generateOtherResponse(userQuery);
+        data.close();
+        return result.toDataStreamResponse({ data });
+      }
+      data.append(JSON.parse(JSON.stringify({ products: maybeProducts })));
+      const result = await generateRecommendationResponse(context, maybeProducts, false);
+      result.textStream.pipeTo(
+        new WritableStream({
+          close() {
+            data.close();
+          },
+        })
+      ).catch(() => {
+        data.close();
+      });
       return result.toDataStreamResponse({ data });
     }
 

@@ -105,8 +105,19 @@ Instructions:
 
 Be generous with detecting follow-ups. Phrases like "show me cheaper", "something else", "more options", "different color", "lower price" are ALL follow-ups.
 
+OCCASION QUERIES ARE PRODUCT SEARCHES, never "other":
+- wedding, shaadi, shadi, bridal, marriage, festive, function, diwali → category fashion, style ethnic, occasion wedding/festive
+- office, work, meeting → fashion, often formal or ethnic office wear
+- gym, workout, running → fashion sportswear
+- party, date night → fashion
+- winter/summer/monsoon → set season and search fashion (and food if they asked for food)
+Hinglish: "shaadi ke liye", "sasta kurta", "kuch vegan snacks" are shopping searches.
+
+OUT OF CATALOG (shoes, phones, hotels, kids clothes, jewellery, lehengas we do not stock, wedding venues): still intent search. Do not write a creative essay. Keywords stay so matching can return no results.
+
 VOICE / HOMOPHONE CORRECTIONS:
 - In this shop, "kirtan", "kirten", "khurta", or "curtain" almost always means "kurta"
+- "stool" in a fashion query means "stole"
 - Set keywords to include "kurta" (and "kurti" if relevant), category fashion
 - Never treat kirtan as music, playlists, or an unknown product that should browse the whole catalog
 

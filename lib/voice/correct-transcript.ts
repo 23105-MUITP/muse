@@ -1,5 +1,5 @@
 export const WHISPER_SHOPPING_PROMPT =
-  'Indian shopping assistant. Catalog words: kurta, kurtas, kurti, palazzo, chinos, joggers, stole, makhana, vegan snacks, green tea, oversized tee. Example: kurta under 500 rupees.';
+  'Indian shopping assistant. Catalog words: kurta, kurtas, kurti, palazzo, chinos, joggers, stole, makhana, vegan snacks, green tea, oversized tee, chikankari, wedding, shaadi, office wear. Example: kurta under 500 rupees.';
 
 const REPLACEMENTS: Array<[RegExp, string]> = [
   [/\bkirtans\b/gi, 'kurtas'],
@@ -13,6 +13,10 @@ const REPLACEMENTS: Array<[RegExp, string]> = [
   [/\bcurtain\b/gi, 'kurta'],
   [/\bmakana\b/gi, 'makhana'],
   [/\bmakhanas\b/gi, 'makhana'],
+  [/\bstools\b/gi, 'stoles'],
+  [/\bstool\b/gi, 'stole'],
+  [/\bshaadi\b/gi, 'shaadi'],
+  [/\bshadi\b/gi, 'shaadi'],
 ];
 
 export function correctShoppingTranscript(text: string): string {

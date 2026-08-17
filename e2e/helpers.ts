@@ -33,8 +33,10 @@ export const KURTA_NAMES = [
 
 export async function gotoShop(page: Page) {
   await page.goto('/');
-  await expect(page.getByText('What can I find for you?')).toBeVisible();
   await expect(page.getByTestId('voice-mic')).toBeVisible();
+  await expect(
+    page.getByText(/What can I find for you|Find what feels right/i)
+  ).toBeVisible();
 }
 
 export async function askShop(page: Page, query: string) {

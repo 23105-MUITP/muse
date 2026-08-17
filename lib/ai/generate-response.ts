@@ -2,6 +2,7 @@ import { streamText } from 'ai';
 import type { ExtractedContext, ScoredProduct, Product } from '@/lib/types';
 import { formatPrice } from '@/lib/utils';
 import { AI_PRESETS } from './config';
+import { CATALOG_SCOPE } from './grounding';
 
 export async function generateRecommendationResponse(
   context: ExtractedContext,
@@ -19,25 +20,21 @@ export async function generateRecommendationResponse(
     )
     .join('\n\n');
 
-  const systemPrompt = `You are ShopSmart AI, a friendly and knowledgeable shopping assistant for Indian consumers.
+  const systemPrompt = `You are Lumin, a warm shopping assistant for Indian food and fashion.
 
-Your personality:
-- Warm and conversational, like a helpful friend
-- Knowledgeable about Indian food and fashion preferences
-- Focused on helping users find exactly what they need
-- Use simple language, avoid being overly formal
+${CATALOG_SCOPE}
 
 Response guidelines:
-1. ${isRefinement ? 'Acknowledge that you understood their refinement (e.g., "Here are some options within your budget..." or "Based on your updated criteria...")' : 'Start with a brief, friendly acknowledgment of what they\'re looking for'}
-2. Present ONLY the products listed below. Do not invent items, playlists, or off-catalog recommendations.
+1. ${isRefinement ? 'Acknowledge that you understood their refinement' : 'Start with a brief, friendly acknowledgment of what they\'re looking for'}
+2. Present ONLY the products listed below. Do not invent items, playlists, venues, or off-catalog recommendations.
 3. Mention the match percentage and key reasons for each product
 4. Use INR (₹) for all prices
-5. End with a helpful suggestion or question to continue the conversation
-6. Keep responses concise but informative (2-3 short paragraphs max)
-${isRefinement ? '7. Reference that this is an updated/refined search based on their new criteria' : ''}
-If the shopper said "kirtan", they mean a kurta. Talk about kurtas, never kirtan music.
+5. End with a helpful suggestion or question
+6. Keep responses concise (2-3 short paragraphs max)
+${isRefinement ? '7. Reference that this is an updated/refined search' : ''}
+If the shopper said "kirtan", they mean a kurta. If they said wedding/shaadi, talk about festive ethnic wear from the list, never venues or lehengas we do not sell.
 
-DO NOT include any JSON, code, or special markers in your response. Just write natural conversational text.`;
+DO NOT include any JSON, code, or markdown tables. Just write natural conversational text.`;
 
   const userPrompt = `User's query: "${context.originalQuery}"
 ${isRefinement ? '\nNote: This is a FOLLOW-UP/REFINEMENT of their previous search. They are narrowing down their options.\n' : ''}
@@ -62,14 +59,11 @@ Write a friendly, conversational response presenting these products to the user.
 }
 
 export async function generateGreetingResponse() {
-  const systemPrompt = `You are ShopSmart AI, a friendly shopping assistant for Indian consumers looking for food and fashion products.
+  const systemPrompt = `You are Lumin, a friendly shopping assistant.
 
-Respond to greetings warmly and briefly introduce what you can help with:
-- Finding the perfect food products (healthy snacks, breakfast items, beverages)
-- Discovering fashion items (ethnic wear, casual clothing, formal wear)
-- Personalized recommendations based on their preferences and budget
+${CATALOG_SCOPE}
 
-Keep the greeting short and inviting. Suggest 2-3 example queries they could try.`;
+Respond to greetings warmly and briefly. Suggest 2-3 example queries from the catalog (kurtas, festive wear, vegan snacks).`;
 
   return streamText({
     model: AI_PRESETS.chat.model,
@@ -80,13 +74,15 @@ Keep the greeting short and inviting. Suggest 2-3 example queries they could try
 }
 
 export async function generateNoResultsResponse(context: ExtractedContext) {
-  const systemPrompt = `You are ShopSmart AI. The user searched for something but we couldn't find good matches.
+  const systemPrompt = `You are Lumin. There are no matching products to show.
 
-Be helpful and:
-1. Acknowledge their search
-2. Explain briefly why we might not have matches
-3. Suggest alternative searches or ask clarifying questions
-4. Stay positive and helpful`;
+${CATALOG_SCOPE}
+
+Be calm and brief:
+1. Acknowledge what they asked for
+2. Say we do not have that in this catalog
+3. Offer two real searches we can do instead
+Never invent inventory, prices, brands, or markdown tables.`;
 
   return streamText({
     model: AI_PRESETS.chat.model,
@@ -95,24 +91,18 @@ Be helpful and:
 Category: ${context.category}
 Keywords: ${context.keywords.join(', ')}
 
-Help them refine their search or suggest alternatives.`,
-    temperature: AI_PRESETS.chat.temperature,
+There are zero matching products. Do not name fake items.`,
+    temperature: 0.2,
   });
 }
 
 export async function generateOtherResponse(query: string) {
-  const systemPrompt = `You are ShopSmart AI, a shopping assistant. The user has asked something that isn't a product search.
+  const systemPrompt = `You are Lumin, a shopping assistant.
 
-Be helpful and:
-1. Try to answer their question if it's about your capabilities
-2. Gently guide them back to product recommendations
-3. Provide example queries they can try
+${CATALOG_SCOPE}
 
-You can help with:
-- Food products: snacks, breakfast items, beverages, spreads
-- Fashion: ethnic wear, casual clothing, formal wear, sportswear, accessories
-
-Keep responses brief and friendly.`;
+If this is off-topic, answer in one sentence and steer back to food or fashion we actually sell.
+Keep responses brief.`;
 
   return streamText({
     model: AI_PRESETS.chat.model,

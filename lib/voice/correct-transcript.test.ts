@@ -17,6 +17,10 @@ describe('correctShoppingTranscript', () => {
     expect(correctShoppingTranscript('masala makana.')).toBe('masala makhana.');
   });
 
+  it('maps stool to stole in this catalog', () => {
+    expect(correctShoppingTranscript('woolen stool')).toBe('woolen stole');
+  });
+
   it('leaves a real kurta query unchanged', () => {
     expect(correctShoppingTranscript('kurta under 500')).toBe('kurta under 500');
   });

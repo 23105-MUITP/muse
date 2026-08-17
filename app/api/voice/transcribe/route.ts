@@ -1,8 +1,6 @@
 import { GROQ_WHISPER_MODEL, groqApiKey } from '@/lib/voice/speech';
-import {
-  WHISPER_SHOPPING_PROMPT,
-  correctShoppingTranscript,
-} from '@/lib/voice/correct-transcript';
+import { WHISPER_SHOPPING_PROMPT } from '@/lib/voice/correct-transcript';
+import { normalizeShoppingQuery } from '@/lib/voice/normalize-query';
 
 export const maxDuration = 30;
 
@@ -48,7 +46,7 @@ export async function POST(req: Request) {
     }
 
     const raw = typeof payload.text === 'string' ? payload.text.trim() : '';
-    const text = correctShoppingTranscript(raw);
+    const text = normalizeShoppingQuery(raw);
     if (!text) {
       return Response.json({ error: 'No speech detected' }, { status: 422 });
     }

@@ -1,4 +1,16 @@
 import type { Product, ExtractedContext, ScoredProduct } from '@/lib/types';
+import {
+  BROWSE_WORDS,
+  DIETARY_WORDS,
+  expandKeyword,
+  occasionLabelsFor,
+  seasonsFor,
+  specificProductKeywords,
+  styleTypesFor,
+  tokenize,
+} from './vocabulary';
+
+export { specificProductKeywords } from './vocabulary';
 
 const SCORE_WEIGHTS = {
   category: 25,
@@ -9,91 +21,66 @@ const SCORE_WEIGHTS = {
 
 const MINIMUM_SCORE_THRESHOLD = 40;
 
-const STOPWORDS = new Set([
-  'under',
-  'below',
-  'less',
-  'than',
-  'show',
-  'find',
-  'want',
-  'need',
-  'please',
-  'something',
-  'cheap',
-  'cheaper',
-  'options',
-  'rupees',
-  'rupee',
-  'rs',
-  'the',
-  'for',
-  'and',
-  'with',
-  'some',
-  'looking',
-]);
-
-const CATEGORY_WORDS = new Set([
-  'fashion',
-  'food',
-  'wear',
-  'clothes',
-  'clothing',
-  'outfit',
-  'outfits',
-  'snacks',
-  'snack',
-  'breakfast',
-  'ethnic',
-  'casual',
-  'formal',
-]);
-
-const KEYWORD_ALIASES: Record<string, string[]> = {
-  kurta: ['kurta', 'kurtas', 'kurti', 'kurtis'],
-  kurtas: ['kurta', 'kurtas', 'kurti', 'kurtis'],
-  kurti: ['kurta', 'kurtas', 'kurti', 'kurtis'],
-  kurtis: ['kurta', 'kurtas', 'kurti', 'kurtis'],
-  kirtan: ['kurta', 'kurtas', 'kurti', 'kurtis'],
-  kirtans: ['kurta', 'kurtas', 'kurti', 'kurtis'],
-  kirten: ['kurta', 'kurtas', 'kurti', 'kurtis'],
-  curtain: ['kurta', 'kurtas', 'kurti', 'kurtis'],
-  curtains: ['kurta', 'kurtas', 'kurti', 'kurtis'],
-  tee: ['tee', 'tees', 't-shirt', 'tshirt'],
-  tees: ['tee', 'tees', 't-shirt', 'tshirt'],
-  tshirt: ['tee', 't-shirt', 'tshirt'],
-  't-shirt': ['tee', 't-shirt', 'tshirt'],
-};
-
-function expandKeyword(keyword: string): string[] {
-  const lower = keyword.toLowerCase();
-  return KEYWORD_ALIASES[lower] || [lower];
-}
-
-function tokenize(value: string): string[] {
-  return value
-    .toLowerCase()
-    .split(/[\s/_-]+/)
-    .map((token) => token.replace(/[^a-z0-9]/g, ''))
-    .filter(Boolean);
-}
-
-export function specificProductKeywords(keywords: string[]): string[] {
-  return keywords.flatMap(tokenize).filter((keyword) => {
-    return keyword.length > 2 && !STOPWORDS.has(keyword) && !/^\d+$/.test(keyword);
-  });
-}
-
 function productSearchText(product: Product): string {
-  return [product.name, product.description, product.brand, product.subcategory, ...product.tags]
+  return [
+    product.name,
+    product.description,
+    product.brand,
+    product.subcategory,
+    ...product.tags,
+    product.style?.type,
+    product.style?.fabric,
+    product.style?.fit,
+    product.style?.season,
+    ...(product.style?.occasion || []),
+    product.dietary?.isVegan ? 'vegan' : '',
+    product.dietary?.isGlutenFree ? 'gluten-free gluten' : '',
+    product.dietary?.isProteinRich ? 'protein' : '',
+    product.dietary?.isOrganic ? 'organic' : '',
+  ]
+    .filter(Boolean)
     .join(' ')
     .toLowerCase();
 }
 
-function productMatchesKeyword(product: Product, keyword: string): boolean {
+export function productMatchesKeyword(product: Product, keyword: string): boolean {
+  const lower = keyword.toLowerCase();
   const productText = productSearchText(product);
-  return expandKeyword(keyword).some((alias) => productText.includes(alias));
+
+  if (expandKeyword(lower).some((alias) => productText.includes(alias))) {
+    return true;
+  }
+
+  const occasions = occasionLabelsFor(lower);
+  if (
+    occasions.length > 0 &&
+    product.style?.occasion.some((occasion) => occasions.includes(occasion.toLowerCase()))
+  ) {
+    return true;
+  }
+
+  const seasons = seasonsFor(lower);
+  if (seasons.length > 0 && product.style && seasons.includes(product.style.season)) {
+    return true;
+  }
+
+  const types = styleTypesFor(lower);
+  if (types.length > 0 && product.style && types.includes(product.style.type)) {
+    return true;
+  }
+
+  if (DIETARY_WORDS.has(lower) && product.dietary) {
+    if (lower === 'vegan') return product.dietary.isVegan;
+    if (lower === 'vegetarian') return product.dietary.isVegetarian;
+    if (lower === 'gluten') return product.dietary.isGlutenFree;
+    if (lower === 'protein') return product.dietary.isProteinRich;
+    if (lower === 'organic') return product.dietary.isOrganic;
+    if (lower === 'healthy') {
+      return product.dietary.isVegan || product.dietary.isLowCalorie || product.dietary.isOrganic;
+    }
+  }
+
+  return false;
 }
 
 function mergedSearchKeywords(context: ExtractedContext): string[] {
@@ -101,6 +88,11 @@ function mergedSearchKeywords(context: ExtractedContext): string[] {
     new Set([
       ...specificProductKeywords(context.keywords),
       ...specificProductKeywords(tokenize(context.originalQuery || '')),
+      ...specificProductKeywords([
+        context.stylePreferences.occasion || '',
+        context.stylePreferences.type || '',
+        context.stylePreferences.season || '',
+      ]),
     ])
   );
 }
@@ -283,9 +275,19 @@ export function matchProducts(
 ): ScoredProduct[] {
   const searchKeywords = mergedSearchKeywords(context);
   const specificKeywords = searchKeywords.filter(
-    (keyword) => !CATEGORY_WORDS.has(keyword)
+    (keyword) => !BROWSE_WORDS.has(keyword)
+  );
+  const browseKeywords = searchKeywords.filter(
+    (keyword) =>
+      occasionLabelsFor(keyword).length > 0 ||
+      seasonsFor(keyword).length > 0 ||
+      styleTypesFor(keyword).length > 0 ||
+      DIETARY_WORDS.has(keyword)
   );
   const primaryKeyword = [...specificKeywords].sort((a, b) => b.length - a.length)[0];
+  const nounInCatalog = primaryKeyword
+    ? products.some((product) => product.inStock && productMatchesKeyword(product, primaryKeyword))
+    : false;
 
   const scoredProducts: ScoredProduct[] = products
     .filter((p) => p.inStock)
@@ -294,11 +296,25 @@ export function matchProducts(
       return product.price <= context.budget.max;
     })
     .filter((product) => {
-      if (primaryKeyword && primaryKeyword.length >= 4) {
-        return productMatchesKeyword(product, primaryKeyword);
+      if (primaryKeyword && !nounInCatalog) {
+        return false;
       }
-      if (specificKeywords.length > 0) {
-        return specificKeywords.some((keyword) => productMatchesKeyword(product, keyword));
+
+      const nounHit = primaryKeyword
+        ? productMatchesKeyword(product, primaryKeyword)
+        : specificKeywords.some((keyword) => productMatchesKeyword(product, keyword));
+      const browseHit =
+        browseKeywords.length === 0 ||
+        browseKeywords.some((keyword) => productMatchesKeyword(product, keyword));
+
+      if (primaryKeyword && browseKeywords.length > 0) {
+        return nounHit || browseHit;
+      }
+      if (primaryKeyword || specificKeywords.length > 0) {
+        return nounHit;
+      }
+      if (browseKeywords.length > 0) {
+        return browseHit;
       }
       return true;
     })

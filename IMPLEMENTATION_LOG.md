@@ -1,5 +1,14 @@
 # Implementation log
 
+## 2026-08-17 — Occasion queries and grounded replies
+
+Wedding/shaadi, office, gym, and other vague looks made the model invent inventory because occasion was not searchable and empty results were ungrounded. Matching now uses occasion, season, and dietary fields; spoken budgets normalize (`five hundred` → `500`); off-catalog nouns like shoes stay empty. Replies are forbidden from inventing products, venues, or tables.
+
+**Tested**
+- `npx vitest run` — 37 passed
+- `npx tsc --noEmit` — pass
+- Production Playwright — pending deploy
+
 ## 2026-08-17 — Muse AI workspace UI redesign
 
 Restyled the existing Next.js shopping assistant as a lavender AI workspace (sidebar, glowing Muse orb, conversational chat, magazine-style recommendation cards) without changing APIs, matching, checkout, voice, or catalog data. Conversation history in the sidebar is the current session's real user messages; taste profile only shows bag, orders, and saved delivery details already on device.

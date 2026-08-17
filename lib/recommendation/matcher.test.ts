@@ -113,6 +113,84 @@ describe('matchProducts', () => {
     expect(results.every((product) => product.price <= 1000)).toBe(true);
   });
 
+  it('treats wedding and shaadi as festive ethnic wear', () => {
+    const wedding = matchProducts(
+      products,
+      context({
+        category: 'fashion',
+        keywords: ['wedding'],
+        originalQuery: 'something for a wedding',
+      })
+    );
+    const shaadi = matchProducts(
+      products,
+      context({
+        category: 'fashion',
+        keywords: ['shaadi'],
+        originalQuery: 'shaadi ke liye kuch',
+      })
+    );
+
+    expect(wedding.length).toBeGreaterThan(0);
+    expect(wedding.every((product) => product.category === 'fashion')).toBe(true);
+    expect(
+      wedding.some((product) =>
+        /kurta|kurti|stole|palazzo/i.test(product.name)
+      )
+    ).toBe(true);
+    expect(wedding.every((product) => product.category !== 'food')).toBe(true);
+    expect(shaadi.some((product) => /kurta|kurti|stole|palazzo/i.test(product.name))).toBe(
+      true
+    );
+  });
+
+  it('returns office and gym looks from occasion, not snacks', () => {
+    const office = matchProducts(
+      products,
+      context({
+        category: 'fashion',
+        originalQuery: 'office wear',
+        keywords: ['office'],
+      })
+    );
+    const gym = matchProducts(
+      products,
+      context({
+        category: 'fashion',
+        originalQuery: 'gym workout clothes',
+        keywords: ['gym', 'workout'],
+      })
+    );
+
+    expect(office.length).toBeGreaterThan(0);
+    expect(office.every((product) => product.category === 'fashion')).toBe(true);
+    expect(gym.some((product) => /track|jogger|athletic/i.test(product.name))).toBe(true);
+    expect(gym.every((product) => product.category === 'fashion')).toBe(true);
+  });
+
+  it('does not substitute random catalog items for shoes or a jacket under 500', () => {
+    const shoes = matchProducts(
+      products,
+      context({
+        category: 'unknown',
+        originalQuery: 'running shoes under 2000',
+        keywords: ['shoes'],
+      })
+    );
+    const jacket = matchProducts(
+      products,
+      context({
+        category: 'fashion',
+        budget: { max: 500, hasConstraint: true },
+        originalQuery: 'denim jacket under 500',
+        keywords: ['denim', 'jacket'],
+      })
+    );
+
+    expect(shoes).toEqual([]);
+    expect(jacket).toEqual([]);
+  });
+
   it('hard-filters products over the stated budget', () => {
     const results = matchProducts(
       products,
