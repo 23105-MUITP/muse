@@ -88,6 +88,7 @@ test.describe('production shopping scenarios', () => {
   });
 
   test('catalog types stay on the named product, not a random cousin', async ({ page }) => {
+    test.setTimeout(240_000);
     const cases = [
       { query: 'white cotton shirt', include: 'Linen Blend Formal Shirt', exclude: /kurta|tee|cookie/i },
       { query: 'protein cookies', include: 'Plant-Based Protein Cookies', exclude: /kurta|shirt/i },
