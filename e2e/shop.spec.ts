@@ -87,7 +87,21 @@ test.describe('production shopping scenarios', () => {
     }
   });
 
-  test('cotton kurta shows the cotton kurta with a real photo', async ({ page }) => {
+  test('white cotton shirt returns the shirt, not random cotton items', async ({ page }) => {
+    await gotoShop(page);
+    await askShop(page, 'white cotton shirt');
+    await waitForProductsOrReply(page);
+
+    const names = await productNames(page);
+    expectNoFood(names);
+    expect(names).toContain('Linen Blend Formal Shirt');
+    expect(names.some((name) => /kurta|kurti|tee/i.test(name))).toBe(false);
+
+    const images = await loadedProductImages(page);
+    const shirt = images.find((image) => /shirt/i.test(image.alt) && !/t-shirt|tee/i.test(image.alt));
+    expect(shirt, 'shirt card is missing a photo').toBeTruthy();
+    expect(shirt!.width).toBeGreaterThan(0);
+  });
     await gotoShop(page);
     await askShop(page, 'cotton kurta');
     await waitForProductsOrReply(page);

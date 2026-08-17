@@ -1,9 +1,13 @@
 import type { Product, ExtractedContext, ScoredProduct } from '@/lib/types';
 import {
   BROWSE_WORDS,
+  COLOR_WORDS,
   DIETARY_WORDS,
+  MATERIAL_WORDS,
   expandKeyword,
+  hasTerm,
   occasionLabelsFor,
+  requiredProductNoun,
   seasonsFor,
   specificProductKeywords,
   styleTypesFor,
@@ -43,11 +47,30 @@ function productSearchText(product: Product): string {
     .toLowerCase();
 }
 
+export function productMatchesNoun(product: Product, noun: string): boolean {
+  const name = product.name.toLowerCase();
+  const text = productSearchText(product);
+
+  if (noun === 'shirt') {
+    return hasTerm(text, 'shirt') && !/tee|t-shirt|kurta|kurti/i.test(name);
+  }
+  if (noun === 'tee') {
+    return hasTerm(name, 'tee') || hasTerm(text, 'tshirt') || hasTerm(text, 't-shirt');
+  }
+  if (noun === 'kurta') {
+    return ['kurta', 'kurtas', 'kurti', 'kurtis'].some((alias) => hasTerm(text, alias));
+  }
+  if (noun === 'tea') {
+    return hasTerm(text, 'tea') && !hasTerm(name, 'tee');
+  }
+  return expandKeyword(noun).some((alias) => hasTerm(text, alias)) || productMatchesKeyword(product, noun);
+}
+
 export function productMatchesKeyword(product: Product, keyword: string): boolean {
   const lower = keyword.toLowerCase();
   const productText = productSearchText(product);
 
-  if (expandKeyword(lower).some((alias) => productText.includes(alias))) {
+  if (expandKeyword(lower).some((alias) => hasTerm(productText, alias))) {
     return true;
   }
 
@@ -257,9 +280,9 @@ function calculateKeywordScore(
 
   for (const keyword of keywords) {
     const aliases = expandKeyword(keyword);
-    if (aliases.some((alias) => productText.includes(alias))) {
+    if (aliases.some((alias) => hasTerm(productText, alias))) {
       matchedKeywords++;
-      if (aliases.some((alias) => product.name.toLowerCase().includes(alias))) {
+      if (aliases.some((alias) => hasTerm(product.name.toLowerCase(), alias))) {
         reasons.push(`Matches "${keyword}"`);
       }
     }
@@ -274,9 +297,11 @@ export function matchProducts(
   context: ExtractedContext
 ): ScoredProduct[] {
   const searchKeywords = mergedSearchKeywords(context);
+  const requiredNoun = requiredProductNoun(searchKeywords);
   const specificKeywords = searchKeywords.filter(
-    (keyword) => !BROWSE_WORDS.has(keyword)
+    (keyword) => !BROWSE_WORDS.has(keyword) && !COLOR_WORDS.has(keyword)
   );
+  const materials = searchKeywords.filter((keyword) => MATERIAL_WORDS.has(keyword));
   const browseKeywords = searchKeywords.filter(
     (keyword) =>
       occasionLabelsFor(keyword).length > 0 ||
@@ -285,17 +310,23 @@ export function matchProducts(
       DIETARY_WORDS.has(keyword)
   );
   const primaryKeyword = [...specificKeywords].sort((a, b) => b.length - a.length)[0];
-  const nounInCatalog = primaryKeyword
-    ? products.some((product) => product.inStock && productMatchesKeyword(product, primaryKeyword))
-    : false;
+  const nounInCatalog = requiredNoun
+    ? products.some((product) => product.inStock && productMatchesNoun(product, requiredNoun))
+    : primaryKeyword
+      ? products.some((product) => product.inStock && productMatchesKeyword(product, primaryKeyword))
+      : false;
 
-  const scoredProducts: ScoredProduct[] = products
+  let candidates = products
     .filter((p) => p.inStock)
     .filter((product) => {
       if (!context.budget.hasConstraint || !context.budget.max) return true;
       return product.price <= context.budget.max;
     })
     .filter((product) => {
+      if (requiredNoun) {
+        return nounInCatalog && productMatchesNoun(product, requiredNoun);
+      }
+
       if (primaryKeyword && !nounInCatalog) {
         return false;
       }
@@ -317,7 +348,18 @@ export function matchProducts(
         return browseHit;
       }
       return true;
-    })
+    });
+
+  if (requiredNoun && materials.length > 0) {
+    const withMaterial = candidates.filter((product) =>
+      materials.some((material) => productMatchesKeyword(product, material))
+    );
+    if (withMaterial.length > 0) {
+      candidates = withMaterial;
+    }
+  }
+
+  const scoredProducts: ScoredProduct[] = candidates
     .map((product) => {
       const categoryScore = calculateCategoryScore(product, context);
       const budgetScore = calculateBudgetScore(product, context);

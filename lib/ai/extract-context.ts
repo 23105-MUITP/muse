@@ -113,7 +113,10 @@ OCCASION QUERIES ARE PRODUCT SEARCHES, never "other":
 - winter/summer/monsoon → set season and search fashion (and food if they asked for food)
 Hinglish: "shaadi ke liye", "sasta kurta", "kuch vegan snacks" are shopping searches.
 
-OUT OF CATALOG (shoes, phones, hotels, kids clothes, jewellery, lehengas we do not stock, wedding venues): still intent search. Do not write a creative essay. Keywords stay so matching can return no results.
+PRODUCT TYPE WINS OVER COLOR AND FABRIC:
+- "white cotton shirt" → a shirt (formal shirt), NOT any cotton kurta or tee
+- Keep the garment type in keywords (shirt, kurta, tee, palazzo, chinos, jacket)
+- Colors like white/blue are optional modifiers. Do not drop the garment type.
 
 VOICE / HOMOPHONE CORRECTIONS:
 - In this shop, "kirtan", "kirten", "khurta", or "curtain" almost always means "kurta"

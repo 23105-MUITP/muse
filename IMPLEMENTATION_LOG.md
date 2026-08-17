@@ -1,5 +1,14 @@
 # Implementation log
 
+## 2026-08-17 — Shirt queries must return shirts
+
+"White cotton shirt" was matching on cotton, so kurtas and tees came back instead of the formal shirt. Product type now wins over color and fabric; colors are optional because most SKUs have no color field. The linen formal shirt is tagged cotton/white so that query can score it.
+
+**Tested**
+- `npx vitest run` — 41 passed
+- `npx tsc --noEmit` — pass
+- Production Playwright — pending deploy
+
 ## 2026-08-17 — Occasion queries and grounded replies
 
 Wedding/shaadi, office, gym, and other vague looks made the model invent inventory because occasion was not searchable and empty results were ungrounded. Matching now uses occasion, season, and dietary fields; spoken budgets normalize (`five hundred` → `500`); off-catalog nouns like shoes stay empty. Replies are forbidden from inventing products, venues, or tables.

@@ -76,6 +76,8 @@ export const KEYWORD_ALIASES: Record<string, string[]> = {
   tees: ['tee', 'tees', 't-shirt', 'tshirt'],
   tshirt: ['tee', 't-shirt', 'tshirt'],
   tshirts: ['tee', 't-shirt', 'tshirt'],
+  shirt: ['shirt', 'shirts'],
+  shirts: ['shirt', 'shirts'],
   palazzo: ['palazzo', 'palazzos'],
   chinos: ['chinos', 'chino'],
   joggers: ['joggers', 'jogger'],
@@ -144,6 +146,75 @@ export const STYLE_TYPE_GROUPS: Record<string, string[]> = {
   casual: ['casual', 'streetwear'],
 };
 
+export const COLOR_WORDS = new Set([
+  'white',
+  'black',
+  'blue',
+  'red',
+  'green',
+  'pink',
+  'yellow',
+  'beige',
+  'ivory',
+  'cream',
+  'navy',
+  'grey',
+  'gray',
+  'brown',
+  'maroon',
+  'gold',
+  'orange',
+  'purple',
+]);
+
+export const MATERIAL_WORDS = new Set([
+  'cotton',
+  'linen',
+  'wool',
+  'woolen',
+  'denim',
+  'silk',
+  'rayon',
+  'fleece',
+  'polyester',
+  'georgette',
+]);
+
+/** Canonical garment/food type. Shirt is not a tee; a tee is not a kurta. */
+export const NOUN_CANONICAL: Record<string, string> = {
+  shirt: 'shirt',
+  shirts: 'shirt',
+  tee: 'tee',
+  tees: 'tee',
+  tshirt: 'tee',
+  tshirts: 'tee',
+  kurta: 'kurta',
+  kurtas: 'kurta',
+  kurti: 'kurta',
+  kurtis: 'kurta',
+  kirtan: 'kurta',
+  kirtans: 'kurta',
+  palazzo: 'palazzo',
+  palazzos: 'palazzo',
+  chinos: 'chinos',
+  chino: 'chinos',
+  joggers: 'joggers',
+  jogger: 'joggers',
+  jacket: 'jacket',
+  jackets: 'jacket',
+  stole: 'stole',
+  stoles: 'stole',
+  pants: 'pants',
+  tea: 'tea',
+  cookies: 'cookies',
+  cookie: 'cookies',
+  makhana: 'makhana',
+  granola: 'granola',
+  quinoa: 'quinoa',
+};
+
+export const PRODUCT_NOUNS = new Set(Object.keys(NOUN_CANONICAL));
+
 export const DIETARY_WORDS = new Set([
   'vegan',
   'vegetarian',
@@ -161,8 +232,10 @@ export const BROWSE_WORDS = new Set([
 ]);
 
 export function tokenize(value: string): string[] {
-  return value
+  const normalized = value
     .toLowerCase()
+    .replace(/\bt[\s-]*shirts?\b/g, 'tshirt');
+  return normalized
     .split(/[\s/_-]+/)
     .map((token) => token.replace(/[^a-z0-9]/g, ''))
     .filter(Boolean);
@@ -189,4 +262,35 @@ export function seasonsFor(keyword: string) {
 
 export function styleTypesFor(keyword: string): string[] {
   return STYLE_TYPE_GROUPS[keyword.toLowerCase()] || [];
+}
+
+export function hasTerm(text: string, term: string): boolean {
+  const hay = text.toLowerCase();
+  const needle = term.toLowerCase();
+  if (needle === 'shirt' || needle === 'shirts') {
+    const withoutTees = hay.replace(/t[\s-]?shirts?/g, 'tshirt');
+    return /\bshirts?\b/.test(withoutTees);
+  }
+  const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(?:^|[^a-z0-9])${escaped}(?:[^a-z0-9]|$)`).test(hay);
+}
+
+export function productNounsFrom(keywords: string[]): string[] {
+  const nouns = keywords
+    .map((keyword) => NOUN_CANONICAL[keyword.toLowerCase()])
+    .filter((noun): noun is string => Boolean(noun));
+  return Array.from(new Set(nouns));
+}
+
+/** Prefer a specific garment (palazzo, shirt) over a generic one (pants) or a material (cotton). */
+export function requiredProductNoun(keywords: string[]): string | undefined {
+  const nouns = productNounsFrom(keywords);
+  if (nouns.length === 0) return undefined;
+  if (nouns.includes('palazzo')) return 'palazzo';
+  if (nouns.includes('chinos')) return 'chinos';
+  if (nouns.includes('joggers')) return 'joggers';
+  if (nouns.includes('shirt')) return 'shirt';
+  if (nouns.includes('tee')) return 'tee';
+  if (nouns.includes('kurta')) return 'kurta';
+  return [...nouns].sort((a, b) => b.length - a.length)[0];
 }

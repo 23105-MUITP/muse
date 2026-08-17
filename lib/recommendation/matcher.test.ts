@@ -242,4 +242,59 @@ describe('matchProducts', () => {
     );
     expect(results.every((p) => p.id !== 'oos')).toBe(true);
   });
+
+  it('white cotton shirt returns the shirt, not cotton kurtas or tees', () => {
+    const results = matchProducts(
+      products,
+      context({
+        category: 'fashion',
+        keywords: ['white', 'cotton', 'shirt'],
+        originalQuery: 'white cotton shirt',
+      })
+    );
+
+    expect(results.map((product) => product.name)).toContain('Linen Blend Formal Shirt');
+    expect(results.every((product) => /shirt/i.test(product.name))).toBe(true);
+    expect(results.some((product) => /kurta|kurti|tee|cookie|makhana/i.test(product.name))).toBe(
+      false
+    );
+  });
+
+  it('cotton kurta stays kurtas, not the formal shirt', () => {
+    const results = matchProducts(
+      products,
+      context({
+        category: 'fashion',
+        keywords: ['cotton', 'kurta'],
+        originalQuery: 'cotton kurta',
+      })
+    );
+
+    expect(results.some((product) => /kurta/i.test(product.name))).toBe(true);
+    expect(results.some((product) => /formal shirt/i.test(product.name))).toBe(false);
+  });
+
+  it('slim fit chinos and denim jacket hit the named garment', () => {
+    const chinos = matchProducts(
+      products,
+      context({
+        category: 'fashion',
+        originalQuery: 'slim fit chinos',
+        keywords: ['slim', 'fit', 'chinos'],
+      })
+    );
+    const jacket = matchProducts(
+      products,
+      context({
+        category: 'fashion',
+        originalQuery: 'denim jacket',
+        keywords: ['denim', 'jacket'],
+      })
+    );
+
+    expect(chinos.map((product) => product.name)).toContain('Slim Fit Chinos');
+    expect(chinos.every((product) => /chino/i.test(product.name))).toBe(true);
+    expect(jacket.map((product) => product.name)).toContain('Classic Denim Jacket');
+    expect(jacket.every((product) => /jacket/i.test(product.name))).toBe(true);
+  });
 });
