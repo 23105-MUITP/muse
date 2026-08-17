@@ -7,7 +7,7 @@
 **Tested**
 - `npx vitest run` — 41 passed
 - `npx tsc --noEmit` — pass
-- Production Playwright — pending deploy
+- Production Playwright — **white cotton shirt, cotton kurta, oversized tee, green tea passed** on https://new-age-technologies-chi.vercel.app
 
 ## 2026-08-17 — Occasion queries and grounded replies
 
