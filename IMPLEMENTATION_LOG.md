@@ -1,5 +1,14 @@
 # Implementation log
 
+## 2026-08-19 — Push clean history to the recreated 23105-MUITP/muse repo
+
+The old `muse` repo was deleted and recreated empty at https://github.com/23105-MUITP/muse.git so GitHub would not keep cached contributors. Clean `ready-to-ship` history (authors only `23105-MUITP`, no `Co-authored-by` trailers) was pushed there.
+
+**Tested**
+- `git log` — every commit authored as 23105-MUITP; no co-author trailers
+- GitHub contributors/mentionable users on the new `muse` repo checked after push
+- No product code change; unit/e2e not re-run
+
 ## 2026-08-18 — Publish clean history to 23105-MUITP/musee
 
 The original `muse` repo kept GeniusPlums, Kabir Teria, and Cursor Agent on the code page because GitHub caches old commits and co-authors. Clean `ready-to-ship` history (authors only `23105-MUITP`, no `Co-authored-by` trailers) was pushed to a new empty repo: https://github.com/23105-MUITP/musee
