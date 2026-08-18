@@ -1,5 +1,13 @@
 # Implementation log
 
+## 2026-08-18 — Drop Cursor and other co-author trailers from git history
+
+The Contributors graph updated to 23105-MUITP, but the repo homepage still listed GeniusPlums, Kabir Teria, Cursor Agent, and Claude because commit messages kept `Co-authored-by` trailers. Those trailers were stripped from every `ready-to-ship` commit and the branch was force-pushed again.
+
+**Tested**
+- `git log` — no `Co-authored-by` / `Co-Authored-By` lines remain
+- No product code change; unit/e2e not re-run
+
 ## 2026-08-18 — Reattribute git history to the course GitHub account
 
 GitHub Contributors listed GeniusPlums (Anish Adamane) and Kabir Teria because commits used `anish.adamane@gmail.com` and `kabirteria@gmail.com`. All `ready-to-ship` commits were rewritten to `23105-MUITP <146740499+23105-MUITP@users.noreply.github.com>` and force-pushed so those personal accounts drop off the graph.
