@@ -1,5 +1,13 @@
 # Implementation log
 
+## 2026-08-18 — Reattribute git history to the course GitHub account
+
+GitHub Contributors listed GeniusPlums (Anish Adamane) and Kabir Teria because commits used `anish.adamane@gmail.com` and `kabirteria@gmail.com`. All `ready-to-ship` commits were rewritten to `23105-MUITP <146740499+23105-MUITP@users.noreply.github.com>` and force-pushed so those personal accounts drop off the graph.
+
+**Tested**
+- `git log --format` — every commit on `ready-to-ship` authored/committed as 23105-MUITP
+- No product code change; unit/e2e not re-run
+
 ## 2026-08-18 — Honor shopper constraints (breakfast, gender, price floor)
 
 Discover "Protein-rich breakfast options" treated leftover adjectives like "rich" as an unknown product and returned an empty catalog. "Women's kurta above 1000" ignored gender and read "above" as a maximum, so a men's kurta under ₹500 could appear. Matching now parses min/max, gender, and dietary flags from the shopper's words, hard-filters them, maps women's kurta to the kurti, and keeps off-catalog nouns like shoes empty.
