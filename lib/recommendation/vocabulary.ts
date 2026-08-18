@@ -11,10 +11,56 @@ export const STOPWORDS = new Set([
   'something',
   'cheap',
   'cheaper',
+  'option',
   'options',
   'rupees',
   'rupee',
   'rs',
+  'rich',
+  'packed',
+  'high',
+  'extra',
+  'items',
+  'item',
+  'products',
+  'product',
+  'choices',
+  'picks',
+  'selection',
+  'ones',
+  'available',
+  'above',
+  'over',
+  'starting',
+  'least',
+  'greater',
+  'between',
+  'around',
+  'upto',
+  'minimum',
+  'maximum',
+  'priced',
+  'price',
+  'from',
+  'women',
+  'womens',
+  'woman',
+  'womans',
+  'ladies',
+  'lady',
+  'female',
+  'girls',
+  'girl',
+  'men',
+  'mens',
+  'man',
+  'mans',
+  'gents',
+  'male',
+  'boys',
+  'boy',
+  'guys',
+  'guy',
   'the',
   'for',
   'and',
@@ -269,12 +315,48 @@ export const DIETARY_WORDS = new Set([
   'healthy',
 ]);
 
+export const GENDER_WORDS = new Set([
+  'women',
+  'womens',
+  'woman',
+  'womans',
+  'ladies',
+  'lady',
+  'female',
+  'girls',
+  'girl',
+  'men',
+  'mens',
+  'man',
+  'mans',
+  'gents',
+  'male',
+  'boys',
+  'boy',
+  'guys',
+  'guy',
+]);
+
 export const BROWSE_WORDS = new Set([
   ...Array.from(CATEGORY_WORDS),
   ...Object.keys(OCCASION_GROUPS),
   ...Object.keys(SEASON_GROUPS),
   ...Array.from(DIETARY_WORDS),
 ]);
+
+export function isModifierToken(token: string): boolean {
+  return (
+    STOPWORDS.has(token) ||
+    COLOR_WORDS.has(token) ||
+    MATERIAL_WORDS.has(token) ||
+    CATEGORY_WORDS.has(token) ||
+    BROWSE_WORDS.has(token) ||
+    DIETARY_WORDS.has(token) ||
+    GENDER_WORDS.has(token) ||
+    WEAK_NAME_TOKENS.has(token) ||
+    token.length < 3
+  );
+}
 
 export function tokenize(value: string): string[] {
   const normalized = value

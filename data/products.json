@@ -240,13 +240,15 @@
         "fit": "regular",
         "season": "summer"
       },
+      "audience": "men",
       "tags": [
         "kurta",
         "ethnic",
         "cotton",
         "handblock",
         "summer",
-        "jaipur"
+        "jaipur",
+        "men"
       ],
       "rating": 4.7,
       "inStock": true
@@ -270,13 +272,15 @@
         "fit": "regular",
         "season": "summer"
       },
+      "audience": "men",
       "tags": [
         "kurta",
         "ethnic",
         "cotton",
         "budget",
         "daily",
-        "summer"
+        "summer",
+        "men"
       ],
       "rating": 4.5,
       "inStock": true
@@ -300,6 +304,7 @@
         "fit": "oversized",
         "season": "all-season"
       },
+      "audience": "unisex",
       "tags": [
         "t-shirt",
         "oversized",
@@ -331,6 +336,7 @@
         "fit": "slim",
         "season": "summer"
       },
+      "audience": "men",
       "tags": [
         "shirt",
         "formal",
@@ -364,13 +370,15 @@
         "fit": "regular",
         "season": "all-season"
       },
+      "audience": "women",
       "tags": [
         "kurti",
         "chikankari",
         "embroidered",
         "ethnic",
         "lucknow",
-        "festive"
+        "festive",
+        "women"
       ],
       "rating": 4.8,
       "inStock": true
@@ -395,6 +403,7 @@
         "fit": "regular",
         "season": "all-season"
       },
+      "audience": "unisex",
       "tags": [
         "track pants",
         "sports",
@@ -426,6 +435,7 @@
         "fit": "regular",
         "season": "winter"
       },
+      "audience": "unisex",
       "tags": [
         "denim",
         "jacket",
@@ -457,13 +467,15 @@
         "fit": "relaxed",
         "season": "summer"
       },
+      "audience": "women",
       "tags": [
         "palazzo",
         "ethnic",
         "printed",
         "comfortable",
         "rayon",
-        "summer"
+        "summer",
+        "women"
       ],
       "rating": 4.4,
       "inStock": true
@@ -488,6 +500,7 @@
         "fit": "slim",
         "season": "all-season"
       },
+      "audience": "men",
       "tags": [
         "chinos",
         "slim-fit",
@@ -519,6 +532,7 @@
         "fit": "regular",
         "season": "winter"
       },
+      "audience": "women",
       "tags": [
         "stole",
         "woolen",
@@ -550,6 +564,7 @@
         "fit": "relaxed",
         "season": "winter"
       },
+      "audience": "unisex",
       "tags": [
         "joggers",
         "comfortable",

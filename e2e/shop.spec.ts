@@ -209,11 +209,61 @@ test.describe('production shopping scenarios', () => {
     await waitForProductsOrReply(page);
 
     const names = await productNames(page);
+    const body = await page.locator('body').innerText();
+    expect(body).not.toMatch(/don't have any protein|do not have any protein|no protein-rich breakfast/i);
     expectNoFashion(names);
     expect(names.length).toBeGreaterThan(0);
-    expect(
-      names.some((name) => /oats|granola|peanut|breakfast|bar/i.test(name))
-    ).toBe(true);
+    expect(names).toContain('Oats & Chia Seed Energy Bars');
+    expect(names.every((name) => !/kurta|kurti|shirt|tee/i.test(name))).toBe(true);
+  });
+
+  test('discover chip for protein breakfast finds catalog breakfast items', async ({ page }) => {
+    await gotoShop(page);
+    await page.getByRole('button', { name: /Protein-rich breakfast options|Start the morning well/i }).click();
+    await page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/chat') && response.request().method() === 'POST',
+      { timeout: 90_000 }
+    );
+    await expect(page.locator('.typing-dot')).toHaveCount(0, { timeout: 90_000 });
+    await waitForProductsOrReply(page);
+
+    const names = await productNames(page);
+    const body = await page.locator('body').innerText();
+    expect(body).not.toMatch(/don't have any protein|do not have any protein/i);
+    expectNoFashion(names);
+    expect(names.length).toBeGreaterThan(0);
+    expect(names).toContain('Oats & Chia Seed Energy Bars');
+  });
+
+  test("women's kurta above 1000 is a women's kurti, not a cheap men's kurta", async ({ page }) => {
+    await gotoShop(page);
+    await askShop(page, "women's kurta above 1000");
+    await waitForProductsOrReply(page);
+
+    const names = await productNames(page);
+    expectNoFood(names);
+    expect(names.length).toBeGreaterThan(0);
+    expect(names).toContain('Embroidered Chikankari Kurti');
+    expect(names).not.toContain('Everyday Cotton Kurta');
+
+    const prices = await page.getByTestId('product-card').evaluateAll((els) =>
+      els.map((el) => Number(el.getAttribute('data-product-price') || '0'))
+    );
+    expect(prices.every((price) => price >= 1000)).toBe(true);
+  });
+
+  test('woman kurta does not return a men\'s kurta', async ({ page }) => {
+    await gotoShop(page);
+    await askShop(page, 'woman kurta');
+    await waitForProductsOrReply(page);
+
+    const names = await productNames(page);
+    expectNoFood(names);
+    expect(names.length).toBeGreaterThan(0);
+    expect(names).toContain('Embroidered Chikankari Kurti');
+    expect(names).not.toContain('Everyday Cotton Kurta');
+    expect(names).not.toContain('Handblock Print Cotton Kurta');
   });
 
   test('makhana search shows makhana with a loaded photo', async ({ page }) => {

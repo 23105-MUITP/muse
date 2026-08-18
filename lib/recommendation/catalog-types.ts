@@ -1,28 +1,5 @@
 import type { Product } from '@/lib/types';
-import {
-  BROWSE_WORDS,
-  CATEGORY_WORDS,
-  COLOR_WORDS,
-  DIETARY_WORDS,
-  MATERIAL_WORDS,
-  STOPWORDS,
-  WEAK_NAME_TOKENS,
-  expandKeyword,
-  tokenize,
-} from './vocabulary';
-
-function isModifierToken(token: string): boolean {
-  return (
-    STOPWORDS.has(token) ||
-    COLOR_WORDS.has(token) ||
-    MATERIAL_WORDS.has(token) ||
-    CATEGORY_WORDS.has(token) ||
-    BROWSE_WORDS.has(token) ||
-    DIETARY_WORDS.has(token) ||
-    WEAK_NAME_TOKENS.has(token) ||
-    token.length < 3
-  );
-}
+import { expandKeyword, isModifierToken, PRODUCT_NOUNS, tokenize } from './vocabulary';
 
 export function distinctiveNameTokens(product: Product): string[] {
   const brandTokens = new Set(tokenize(product.brand));
@@ -74,26 +51,55 @@ export function catalogTypeGate(
   const index = catalogTypeIndex(products);
   const typeHits = queryTokens
     .filter((token) => !isModifierToken(token))
-    .map((token) => ({
-      token,
-      matches: index.get(token) || products.filter((product) => tokenMatchesProduct(product, token)),
-    }))
-    .filter((hit) => (index.has(hit.token) || hit.matches.length > 0) && hit.matches.length > 0);
+    .map((token) => {
+      const aliases = expandKeyword(token);
+      const seen = new Set<string>();
+      const matches: Product[] = [];
+      for (const alias of aliases) {
+        for (const product of index.get(alias) || []) {
+          if (!seen.has(product.id)) {
+            seen.add(product.id);
+            matches.push(product);
+          }
+        }
+        for (const product of products) {
+          if (!product.inStock || seen.has(product.id)) continue;
+          if (tokenMatchesProduct(product, alias)) {
+            seen.add(product.id);
+            matches.push(product);
+          }
+        }
+      }
+      return { token, matches };
+    })
+    .filter((hit) => hit.matches.length > 0);
 
-  if (typeHits.length > 0) {
-    typeHits.sort((a, b) => {
+  const unknownTokens = queryTokens.filter(
+    (token) =>
+      !isModifierToken(token) &&
+      !typeHits.some((hit) => hit.token === token) &&
+      !index.has(token) &&
+      !products.some((product) => tokenMatchesProduct(product, token))
+  );
+  const catalogNounHits = typeHits.filter(
+    (hit) => PRODUCT_NOUNS.has(hit.token) || expandKeyword(hit.token).some((alias) => PRODUCT_NOUNS.has(alias))
+  );
+
+  // "running shoes" must not collapse onto sportswear/track pants.
+  if (unknownTokens.length > 0 && catalogNounHits.length === 0) {
+    return new Set();
+  }
+
+  const rankedHits =
+    unknownTokens.length > 0 && catalogNounHits.length > 0 ? catalogNounHits : typeHits;
+  if (rankedHits.length > 0) {
+    rankedHits.sort((a, b) => {
       const spec = a.matches.length - b.matches.length;
       if (spec !== 0) return spec;
       return b.token.length - a.token.length;
     });
-    return new Set(typeHits[0].matches.map((product) => product.id));
+    return new Set(rankedHits[0].matches.map((product) => product.id));
   }
 
-  const unknownType = queryTokens.some(
-    (token) =>
-      !isModifierToken(token) &&
-      !index.has(token) &&
-      !products.some((product) => tokenMatchesProduct(product, token))
-  );
-  return unknownType ? new Set() : null;
+  return null;
 }

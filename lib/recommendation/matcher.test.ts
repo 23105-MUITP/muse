@@ -205,6 +205,21 @@ describe('matchProducts', () => {
     expect(jacket).toEqual([]);
   });
 
+  it('does not substitute track pants for running shoes even if style is sportswear', () => {
+    const results = matchProducts(
+      products,
+      context({
+        category: 'fashion',
+        stylePreferences: { type: 'sportswear' },
+        budget: { max: 2000, hasConstraint: true },
+        originalQuery: 'running shoes under 2000',
+        keywords: ['shoes', 'running', 'sportswear'],
+      })
+    );
+
+    expect(results).toEqual([]);
+  });
+
   it('hard-filters products over the stated budget', () => {
     const results = matchProducts(
       products,
@@ -272,6 +287,71 @@ describe('matchProducts', () => {
 
     expect(results.some((product) => /kurta/i.test(product.name))).toBe(true);
     expect(results.some((product) => /formal shirt/i.test(product.name))).toBe(false);
+  });
+
+  it('protein-rich breakfast options returns breakfast protein, not an empty catalog', () => {
+    const results = matchProducts(
+      products,
+      context({
+        category: 'unknown',
+        keywords: ['protein', 'rich', 'breakfast', 'options'],
+        originalQuery: 'Protein-rich breakfast options',
+      })
+    );
+
+    expect(results.length).toBeGreaterThan(0);
+    expect(results.every((product) => product.category === 'food')).toBe(true);
+    expect(results.every((product) => product.dietary?.isProteinRich)).toBe(true);
+    expect(results.map((product) => product.name)).toContain('Oats & Chia Seed Energy Bars');
+    expect(results.some((product) => /kurta|kurti|shirt|tee/i.test(product.name))).toBe(false);
+  });
+
+  it("women's kurta above 1000 is the kurti, not a cheap men's kurta", () => {
+    const results = matchProducts(
+      products,
+      context({
+        category: 'fashion',
+        budget: { max: 1000, hasConstraint: true },
+        keywords: ['kurta'],
+        originalQuery: "women's kurta above 1000",
+      })
+    );
+
+    expect(results.length).toBeGreaterThan(0);
+    expect(results.every((product) => product.price >= 1000)).toBe(true);
+    expect(results.every((product) => product.audience !== 'men')).toBe(true);
+    expect(results.map((product) => product.name)).toContain('Embroidered Chikankari Kurti');
+    expect(results.some((product) => /Everyday Cotton Kurta/i.test(product.name))).toBe(false);
+  });
+
+  it('woman kurta stays on women ethnic wear', () => {
+    const results = matchProducts(
+      products,
+      context({
+        category: 'fashion',
+        keywords: ['kurta'],
+        originalQuery: 'woman kurta',
+      })
+    );
+
+    expect(results.length).toBeGreaterThan(0);
+    expect(results.every((product) => product.audience !== 'men')).toBe(true);
+    expect(results.map((product) => product.name)).toContain('Embroidered Chikankari Kurti');
+  });
+
+  it('hard-filters products below the stated minimum', () => {
+    const results = matchProducts(
+      products,
+      context({
+        category: 'fashion',
+        budget: { min: 1000, hasConstraint: true },
+        keywords: ['kurta'],
+        originalQuery: 'kurta above 1000',
+      })
+    );
+
+    expect(results.every((product) => product.price >= 1000)).toBe(true);
+    expect(results.some((product) => product.price < 1000)).toBe(false);
   });
 
   it('slim fit chinos and denim jacket hit the named garment', () => {

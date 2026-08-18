@@ -2,6 +2,7 @@ import { generateObject } from 'ai';
 import { z } from 'zod';
 import type { ExtractedContext } from '@/lib/types';
 import { AI_PRESETS } from './config';
+import { applyQueryConstraints } from '@/lib/recommendation/query-constraints';
 
 const contextSchema = z.object({
   intent: z.enum([
@@ -19,8 +20,8 @@ const contextSchema = z.object({
   ]).describe('Detect user intent including cart, checkout, and order history'),
   category: z.enum(['food', 'fashion', 'both', 'unchanged']).describe('Use "unchanged" if user is refining previous search without mentioning category'),
   budget: z.object({
-    min: z.number().optional(),
-    max: z.number().optional(),
+    min: z.number().nullish(),
+    max: z.number().nullish(),
     hasConstraint: z.boolean(),
     unchanged: z.boolean().describe('True if user did not mention budget in this message'),
   }),
@@ -34,14 +35,15 @@ const contextSchema = z.object({
     unchanged: z.boolean().describe('True if user did not mention dietary preferences in this message'),
   }),
   stylePreferences: z.object({
-    type: z.enum(['ethnic', 'casual', 'formal', 'sportswear', 'streetwear']).optional(),
+    type: z.enum(['ethnic', 'casual', 'formal', 'sportswear', 'streetwear']).optional().or(z.literal('')),
     occasion: z.string().optional(),
     fabric: z.string().optional(),
-    fit: z.enum(['regular', 'slim', 'oversized', 'relaxed']).optional(),
-    season: z.enum(['summer', 'winter', 'all-season', 'monsoon']).optional(),
+    fit: z.enum(['regular', 'slim', 'oversized', 'relaxed']).optional().or(z.literal('')),
+    season: z.enum(['summer', 'winter', 'all-season', 'monsoon']).optional().or(z.literal('')),
     unchanged: z.boolean().describe('True if user did not mention style preferences in this message'),
   }),
   keywords: z.array(z.string()),
+  gender: z.enum(['men', 'women', 'any', 'unchanged']).describe('Shopper gender for fashion. "women\'s kurta" is women. Use unchanged if they did not mention it.'),
   isFollowUp: z.boolean().describe('True if this is a follow-up/refinement of a previous search'),
   cartAction: z.object({
     type: z.enum(['add', 'remove', 'view', 'clear']).optional(),
@@ -53,6 +55,33 @@ const contextSchema = z.object({
 
 // Store the last context for maintaining conversation state
 let lastContext: ExtractedContext | null = null;
+
+function asStyleType(
+  value: string | undefined
+): ExtractedContext['stylePreferences']['type'] {
+  if (value === 'ethnic' || value === 'casual' || value === 'formal' || value === 'sportswear' || value === 'streetwear') {
+    return value;
+  }
+  return undefined;
+}
+
+function asFit(
+  value: string | undefined
+): ExtractedContext['stylePreferences']['fit'] {
+  if (value === 'regular' || value === 'slim' || value === 'oversized' || value === 'relaxed') {
+    return value;
+  }
+  return undefined;
+}
+
+function asSeason(
+  value: string | undefined
+): ExtractedContext['stylePreferences']['season'] {
+  if (value === 'summer' || value === 'winter' || value === 'all-season' || value === 'monsoon') {
+    return value;
+  }
+  return undefined;
+}
 
 export async function extractContext(
   query: string,
@@ -101,7 +130,25 @@ Instructions:
    - Extract all relevant fields fresh
    - Set "unchanged" to false for all fields
 4. Intent "refinement" = user is adjusting previous search
-5. Budget is in INR (₹). Common patterns: "under X", "below X", "less than X", "within X"
+5. Budget is in INR (₹). Common patterns:
+   - "under X", "below X", "less than X", "within X" → max = X
+   - "above X", "over X", "starting at X", "from X", "X+" → min = X, NOT max
+   Never treat "above 1000" as a maximum of 1000.
+
+GENDER AND WHO THE CLOTHES ARE FOR:
+- "women's", "woman", "ladies", "for her" → gender women
+- "men's", "man", "gents", "for him" → gender men
+- In this catalog kurtis, palazzos, and stoles are women's; kurtas, shirts, and chinos are typically men's; tees/jackets/joggers are unisex
+- "women's kurta" or "woman kurta" means the women's kurti, never a men's kurta
+
+DIETARY AND MEAL QUERIES:
+- "protein-rich", "protein rich", "high protein" → proteinRich true, category food
+- "breakfast" is a real meal we sell (bars, granola). Never say the catalog has no breakfast items if those exist.
+- Keep breakfast and protein in keywords
+
+PRODUCT TYPE ALWAYS WINS OVER COLOR, FABRIC, FIT, AND BRAND.
+Whatever they asked for — shirt, kurta, tee, palazzo, chinos, jacket, stole, cookies, tea, makhana, granola — keep that product type in keywords.
+A cotton shirt is a shirt. A cotton kurta is a kurta. Do not replace the type with a material or color.
 
 Be generous with detecting follow-ups. Phrases like "show me cheaper", "something else", "more options", "different color", "lower price" are ALL follow-ups.
 
@@ -112,10 +159,6 @@ OCCASION QUERIES ARE PRODUCT SEARCHES, never "other":
 - party, date night → fashion
 - winter/summer/monsoon → set season and search fashion (and food if they asked for food)
 Hinglish: "shaadi ke liye", "sasta kurta", "kuch vegan snacks" are shopping searches.
-
-PRODUCT TYPE ALWAYS WINS OVER COLOR, FABRIC, FIT, AND BRAND.
-Whatever they asked for — shirt, kurta, tee, palazzo, chinos, jacket, stole, cookies, tea, makhana, granola — keep that product type in keywords.
-A cotton shirt is a shirt. A cotton kurta is a kurta. Do not replace the type with a material or color.
 
 VOICE / HOMOPHONE CORRECTIONS:
 - In this shop, "kirtan", "kirten", "khurta", or "curtain" almost always means "kurta"
@@ -156,8 +199,8 @@ COMPARISON DETECTION:
         budget: object.budget.unchanged
           ? lastContext.budget
           : {
-              min: object.budget.min,
-              max: object.budget.max,
+              min: object.budget.min ?? undefined,
+              max: object.budget.max ?? undefined,
               hasConstraint: object.budget.hasConstraint
             },
         dietaryPreferences: object.dietaryPreferences.unchanged
@@ -173,15 +216,19 @@ COMPARISON DETECTION:
         stylePreferences: object.stylePreferences.unchanged
           ? lastContext.stylePreferences
           : {
-              type: object.stylePreferences.type,
-              occasion: object.stylePreferences.occasion,
-              fabric: object.stylePreferences.fabric,
-              fit: object.stylePreferences.fit,
-              season: object.stylePreferences.season,
+              type: asStyleType(object.stylePreferences.type),
+              occasion: object.stylePreferences.occasion || undefined,
+              fabric: object.stylePreferences.fabric || undefined,
+              fit: asFit(object.stylePreferences.fit),
+              season: asSeason(object.stylePreferences.season),
             },
         keywords: object.keywords.length > 0
           ? Array.from(new Set([...lastContext.keywords, ...object.keywords]))
           : lastContext.keywords,
+        gender:
+          object.gender === 'unchanged' || object.gender === 'any'
+            ? lastContext.gender
+            : object.gender,
         originalQuery: query,
         cartAction: object.cartAction,
         comparisonProducts: object.comparisonProducts,
@@ -191,8 +238,8 @@ COMPARISON DETECTION:
         intent: object.intent === 'refinement' ? 'search' : object.intent,
         category: object.category === 'unchanged' ? 'unknown' : (object.category as 'food' | 'fashion' | 'both' | 'unknown'),
         budget: {
-          min: object.budget.min,
-          max: object.budget.max,
+          min: object.budget.min ?? undefined,
+          max: object.budget.max ?? undefined,
           hasConstraint: object.budget.hasConstraint
         },
         dietaryPreferences: {
@@ -204,18 +251,21 @@ COMPARISON DETECTION:
           lowCalorie: object.dietaryPreferences.lowCalorie,
         },
         stylePreferences: {
-          type: object.stylePreferences.type,
-          occasion: object.stylePreferences.occasion,
-          fabric: object.stylePreferences.fabric,
-          fit: object.stylePreferences.fit,
-          season: object.stylePreferences.season,
+          type: asStyleType(object.stylePreferences.type),
+          occasion: object.stylePreferences.occasion || undefined,
+          fabric: object.stylePreferences.fabric || undefined,
+          fit: asFit(object.stylePreferences.fit),
+          season: asSeason(object.stylePreferences.season),
         },
         keywords: object.keywords,
+        gender: object.gender === 'men' || object.gender === 'women' ? object.gender : undefined,
         originalQuery: query,
         cartAction: object.cartAction,
         comparisonProducts: object.comparisonProducts,
       };
     }
+
+    finalContext = applyQueryConstraints(finalContext);
 
     // Save context for next turn
     if (
@@ -250,7 +300,7 @@ COMPARISON DETECTION:
       keywords: query.toLowerCase().split(' ').filter((w) => w.length > 2),
       originalQuery: query,
     };
-    return { ...fallback, originalQuery: query };
+    return applyQueryConstraints({ ...fallback, originalQuery: query });
   }
 }
 

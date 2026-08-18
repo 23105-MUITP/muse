@@ -8,6 +8,9 @@ export interface DietaryInfo {
   isLowCalorie: boolean;
 }
 
+export type ProductAudience = 'men' | 'women' | 'unisex';
+export type ShopperGender = 'men' | 'women';
+
 export interface StyleInfo {
   type: 'ethnic' | 'casual' | 'formal' | 'sportswear' | 'streetwear';
   occasion: string[];
@@ -27,6 +30,7 @@ export interface Product {
   brand: string;
   dietary?: DietaryInfo;
   style?: StyleInfo;
+  audience?: ProductAudience;
   tags: string[];
   rating: number;
   inStock: boolean;
@@ -117,6 +121,7 @@ export interface ExtractedContext {
   budget: BudgetConstraint;
   dietaryPreferences: DietaryPreferences;
   stylePreferences: StylePreferences;
+  gender?: ShopperGender;
   keywords: string[];
   originalQuery: string;
   cartAction?: CartAction;

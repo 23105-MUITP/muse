@@ -1,5 +1,15 @@
 # Implementation log
 
+## 2026-08-18 — Honor shopper constraints (breakfast, gender, price floor)
+
+Discover "Protein-rich breakfast options" treated leftover adjectives like "rich" as an unknown product and returned an empty catalog. "Women's kurta above 1000" ignored gender and read "above" as a maximum, so a men's kurta under ₹500 could appear. Matching now parses min/max, gender, and dietary flags from the shopper's words, hard-filters them, maps women's kurta to the kurti, and keeps off-catalog nouns like shoes empty.
+
+**Tested**
+- `npx vitest run` — 91 passed
+- `npx tsc --noEmit` — pass
+- `npm run lint` — pass
+- `npx playwright test` — **39 passed**, including Discover protein breakfast chip, typed protein breakfast, women's kurta above 1000, woman kurta, and running shoes staying empty
+
 ## 2026-08-18 — Capstone pitch deck content
 
 Added a 10-slide shareable brief at `docs/PITCH_DECK.md` for the faculty pitch: problem, context-engineering pipeline, hybrid matcher, stack, live demo script, India/UX, and Q&A. Matches the Muse product (hosted app, Groq, voice, checkout) rather than the original Gemini plan.

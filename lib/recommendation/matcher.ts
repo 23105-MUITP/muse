@@ -1,6 +1,7 @@
-import type { Product, ExtractedContext, ScoredProduct } from '@/lib/types';
+import type { Product, ExtractedContext, ScoredProduct, ShopperGender } from '@/lib/types';
 import {
   BROWSE_WORDS,
+  CATEGORY_WORDS,
   COLOR_WORDS,
   DIETARY_WORDS,
   MATERIAL_WORDS,
@@ -15,6 +16,7 @@ import {
 } from './vocabulary';
 
 import { catalogTypeGate } from './catalog-types';
+import { applyQueryConstraints } from './query-constraints';
 
 const SCORE_WEIGHTS = {
   category: 25,
@@ -41,13 +43,18 @@ function productSearchText(product: Product): string {
     product.dietary?.isGlutenFree ? 'gluten-free gluten' : '',
     product.dietary?.isProteinRich ? 'protein' : '',
     product.dietary?.isOrganic ? 'organic' : '',
+    product.audience || '',
   ]
     .filter(Boolean)
     .join(' ')
     .toLowerCase();
 }
 
-export function productMatchesNoun(product: Product, noun: string): boolean {
+export function productMatchesNoun(
+  product: Product,
+  noun: string,
+  gender?: ShopperGender
+): boolean {
   const name = product.name.toLowerCase();
   const text = productSearchText(product);
 
@@ -58,7 +65,13 @@ export function productMatchesNoun(product: Product, noun: string): boolean {
     return hasTerm(name, 'tee') || hasTerm(text, 'tshirt') || hasTerm(text, 't-shirt');
   }
   if (noun === 'kurta') {
-    return ['kurta', 'kurtas', 'kurti', 'kurtis'].some((alias) => hasTerm(text, alias));
+    const aliases =
+      gender === 'men'
+        ? ['kurta', 'kurtas']
+        : gender === 'women'
+          ? ['kurti', 'kurtis', 'kurta', 'kurtas']
+          : ['kurta', 'kurtas', 'kurti', 'kurtis'];
+    return aliases.some((alias) => hasTerm(text, alias));
   }
   if (noun === 'tea') {
     return hasTerm(text, 'tea') && !hasTerm(name, 'tee');
@@ -142,8 +155,7 @@ function calculateBudgetScore(product: Product, context: ExtractedContext): numb
   }
 
   if (min && price < min) {
-    // Under budget minimum - slight penalty
-    return SCORE_WEIGHTS.budget * 0.7;
+    return 0;
   }
 
   // Within budget
@@ -292,12 +304,28 @@ function calculateKeywordScore(
   return { score, reasons };
 }
 
+function productMatchesGender(product: Product, gender?: ShopperGender): boolean {
+  if (!gender || product.category !== 'fashion') return true;
+  const audience = product.audience || 'unisex';
+  return audience === 'unisex' || audience === gender;
+}
+
+function tightenBy<T>(items: T[], predicate: (item: T) => boolean): T[] {
+  const next = items.filter(predicate);
+  return next.length > 0 ? next : items;
+}
+
 export function matchProducts(
   products: Product[],
-  context: ExtractedContext
+  rawContext: ExtractedContext
 ): ScoredProduct[] {
+  const context = applyQueryConstraints(rawContext);
   const searchKeywords = mergedSearchKeywords(context);
-  const typeGate = catalogTypeGate(searchKeywords, products);
+  const spokenTokens = specificProductKeywords(tokenize(context.originalQuery || ''));
+  const typeGate = catalogTypeGate(
+    spokenTokens.length > 0 ? spokenTokens : searchKeywords,
+    products
+  );
   const requiredNoun = requiredProductNoun(searchKeywords);
   const specificKeywords = searchKeywords.filter(
     (keyword) => !BROWSE_WORDS.has(keyword) && !COLOR_WORDS.has(keyword)
@@ -308,11 +336,17 @@ export function matchProducts(
       occasionLabelsFor(keyword).length > 0 ||
       seasonsFor(keyword).length > 0 ||
       styleTypesFor(keyword).length > 0 ||
-      DIETARY_WORDS.has(keyword)
+      DIETARY_WORDS.has(keyword) ||
+      CATEGORY_WORDS.has(keyword)
   );
+  const dietaryKeywords = browseKeywords.filter((keyword) => DIETARY_WORDS.has(keyword));
+  const otherBrowseKeywords = browseKeywords.filter((keyword) => !DIETARY_WORDS.has(keyword));
   const primaryKeyword = [...specificKeywords].sort((a, b) => b.length - a.length)[0];
   const nounInCatalog = requiredNoun
-    ? products.some((product) => product.inStock && productMatchesNoun(product, requiredNoun))
+    ? products.some(
+        (product) =>
+          product.inStock && productMatchesNoun(product, requiredNoun, context.gender)
+      )
     : primaryKeyword
       ? products.some((product) => product.inStock && productMatchesKeyword(product, primaryKeyword))
       : false;
@@ -320,16 +354,19 @@ export function matchProducts(
   let candidates = products
     .filter((p) => p.inStock)
     .filter((product) => {
-      if (!context.budget.hasConstraint || !context.budget.max) return true;
-      return product.price <= context.budget.max;
+      if (!context.budget.hasConstraint) return true;
+      if (context.budget.max && product.price > context.budget.max) return false;
+      if (context.budget.min && product.price < context.budget.min) return false;
+      return true;
     })
+    .filter((product) => productMatchesGender(product, context.gender))
     .filter((product) => {
       if (typeGate) {
         return typeGate.has(product.id);
       }
 
       if (requiredNoun) {
-        return nounInCatalog && productMatchesNoun(product, requiredNoun);
+        return nounInCatalog && productMatchesNoun(product, requiredNoun, context.gender);
       }
 
       if (primaryKeyword && !nounInCatalog) {
@@ -339,9 +376,13 @@ export function matchProducts(
       const nounHit = primaryKeyword
         ? productMatchesKeyword(product, primaryKeyword)
         : specificKeywords.some((keyword) => productMatchesKeyword(product, keyword));
-      const browseHit =
-        browseKeywords.length === 0 ||
-        browseKeywords.some((keyword) => productMatchesKeyword(product, keyword));
+      const dietaryHit =
+        dietaryKeywords.length === 0 ||
+        dietaryKeywords.every((keyword) => productMatchesKeyword(product, keyword));
+      const otherBrowseHit =
+        otherBrowseKeywords.length === 0 ||
+        otherBrowseKeywords.some((keyword) => productMatchesKeyword(product, keyword));
+      const browseHit = dietaryHit && otherBrowseHit;
 
       if (primaryKeyword && browseKeywords.length > 0) {
         return nounHit || browseHit;
@@ -355,13 +396,32 @@ export function matchProducts(
       return true;
     });
 
+  if (dietaryKeywords.length > 0 && otherBrowseKeywords.length > 0) {
+    candidates = tightenBy(
+      candidates,
+      (product) =>
+        dietaryKeywords.every((keyword) => productMatchesKeyword(product, keyword)) &&
+        otherBrowseKeywords.some((keyword) => productMatchesKeyword(product, keyword))
+    );
+  }
+
+  if (context.dietaryPreferences.proteinRich) {
+    candidates = tightenBy(candidates, (product) => Boolean(product.dietary?.isProteinRich));
+  }
+  if (context.dietaryPreferences.vegan) {
+    candidates = tightenBy(candidates, (product) => Boolean(product.dietary?.isVegan));
+  }
+  if (context.dietaryPreferences.glutenFree) {
+    candidates = tightenBy(candidates, (product) => Boolean(product.dietary?.isGlutenFree));
+  }
+  if (context.dietaryPreferences.organic) {
+    candidates = tightenBy(candidates, (product) => Boolean(product.dietary?.isOrganic));
+  }
+
   if ((typeGate || requiredNoun) && materials.length > 0) {
-    const withMaterial = candidates.filter((product) =>
+    candidates = tightenBy(candidates, (product) =>
       materials.some((material) => productMatchesKeyword(product, material))
     );
-    if (withMaterial.length > 0) {
-      candidates = withMaterial;
-    }
   }
 
   const scoredProducts: ScoredProduct[] = candidates
@@ -384,6 +444,15 @@ export function matchProducts(
 
       if (context.budget.hasConstraint && context.budget.max && product.price <= context.budget.max) {
         matchReasons.push('Within budget');
+      }
+      if (context.budget.min && product.price >= context.budget.min) {
+        matchReasons.push(`From ₹${context.budget.min}`);
+      }
+      if (context.gender === 'women' && product.audience === 'women') {
+        matchReasons.push('For women');
+      }
+      if (context.gender === 'men' && product.audience === 'men') {
+        matchReasons.push('For men');
       }
 
       matchReasons.push(...prefReasons, ...kwReasons);

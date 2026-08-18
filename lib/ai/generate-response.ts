@@ -1,8 +1,16 @@
 import { streamText } from 'ai';
-import type { ExtractedContext, ScoredProduct, Product } from '@/lib/types';
+import type { BudgetConstraint, ExtractedContext, ScoredProduct, Product } from '@/lib/types';
 import { formatPrice } from '@/lib/utils';
 import { AI_PRESETS } from './config';
 import { CATALOG_SCOPE } from './grounding';
+
+function describeBudget(budget: BudgetConstraint): string {
+  if (!budget.hasConstraint) return 'No specific budget';
+  if (budget.min && budget.max) return `${formatPrice(budget.min)}–${formatPrice(budget.max)}`;
+  if (budget.min) return `From ${formatPrice(budget.min)}`;
+  if (budget.max) return `Up to ${formatPrice(budget.max)}`;
+  return 'No specific budget';
+}
 
 export async function generateRecommendationResponse(
   context: ExtractedContext,
@@ -40,7 +48,8 @@ DO NOT include any JSON, code, or markdown tables. Just write natural conversati
 ${isRefinement ? '\nNote: This is a FOLLOW-UP/REFINEMENT of their previous search. They are narrowing down their options.\n' : ''}
 Extracted preferences:
 - Category: ${context.category}
-- Budget: ${context.budget.hasConstraint ? `Up to ${formatPrice(context.budget.max || 0)}` : 'No specific budget'}
+- Budget: ${describeBudget(context.budget)}
+- For: ${context.gender || 'Not specified'}
 - Style: ${context.stylePreferences.type || 'Not specified'}
 - Key interests: ${context.keywords.join(', ') || 'General browsing'}
 
