@@ -1,5 +1,12 @@
 # Implementation log
 
+## 2026-08-18 — Capstone pitch deck content
+
+Added a 10-slide shareable brief at `docs/PITCH_DECK.md` for the faculty pitch: problem, context-engineering pipeline, hybrid matcher, stack, live demo script, India/UX, and Q&A. Matches the Muse product (hosted app, Groq, voice, checkout) rather than the original Gemini plan.
+
+**Tested**
+- Documentation-only; no unit or e2e run
+
 ## 2026-08-17 — Product photos match the named SKU
 
 Saree-on-kurta was one case of a catalog-wide mismatch: kurtas and kurtis used saree photos, bars used Coca-Cola, makhana used chocolates, trail mix used onions, jackets used a jeans rack, and so on. Every SKU now has its own verified photo; Indian snacks that Unsplash does not have are stored locally.
